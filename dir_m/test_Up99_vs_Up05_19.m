@@ -17,11 +17,11 @@ if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% Assume path is set using dir_lakcluster_c/dir_m/setup_0.m. ;')); end;
 
 if (flag_verbose); disp(sprintf(' %% Comparing Up99 with Up05 data. ;')); end;
-Jeremy_GB = 48; %<-- maybe this should be increased? ;
-if (flag_verbose); disp(sprintf(' %% trying with Jeremy_GB %d ;',Jeremy_GB)); end;
+memory_GB = 128;
+if (flag_verbose); disp(sprintf(' %% trying with memory set to %d ;', memory_GB));end;
 
 dir_code = '/home/jelman/Github/lakcluster_c';
-dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_geno_data';
+dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1';
 dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
 if ~exist(dir_jpg,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg)); mkdir(dir_jpg); end;
 
@@ -40,7 +40,7 @@ if ~exist(dataset.fname_bimext,'file');
 dataset.fname_bimext = sprintf('%s/%s_bim.ext',dataset.dir_0in,dataset.str_prefix);
 end;%if ~exist(dataset.fname_bimext,'file');
 if ~exist(dataset.fname_bimext,'file');
-dataset.fname_bimext = sprintf('%s/test0mds_maf01_bim.ext',dataset.dir_0in);
+dataset.fname_bimext = sprintf('%s/test2mds_maf01_bim.ext',dataset.dir_0in);
 end;%if ~exist(dataset.fname_bimext,'file');
 if ~exist(dataset.fname_bimext,'file');
 dataset.fname_bimext = sprintf('%s/%s_bim.ext',dataset.dir_0in,dataset.str_dataset);
@@ -72,7 +72,7 @@ if ~exist(dataset.fname_famext,'file');
 dataset.fname_famext = sprintf('%s/%s_fam.ext',dataset.dir_0in,dataset.str_prefix);
 end;%if ~exist(dataset.fname_famext,'file');
 if ~exist(dataset.fname_famext,'file');
-dataset.fname_famext = sprintf('%s/test0mds_maf01_fam.ext',dataset.dir_0in);
+dataset.fname_famext = sprintf('%s/test2mds_maf01_fam.ext',dataset.dir_0in);
 end;%if ~exist(dataset.fname_famext,'file');
 if ~exist(dataset.fname_famext,'file');
 dataset.fname_famext = sprintf('%s/%s_fam.ext',dataset.dir_0in,dataset.str_dataset);
@@ -109,7 +109,7 @@ end;%for nd=0:1;
 
 for ndataset=0:n_dataset-1;
 parameter = struct('type','parameter');
-parameter.slurm_memdecl = Jeremy_GB; %<-- maybe this should be increased? ;
+parameter.slurm_memdecl = memory_GB; %<--- May need to be increased ;
 parameter.dir_0in = dataset_{1+ndataset}.dir_0in;
 parameter.str_prefix = dataset_{1+ndataset}.str_prefix;
 tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% load_mx__from_parameter_ver0 ...')); end;
@@ -237,25 +237,25 @@ title(str_Up05_A_p_p01,'Interpreter','none');
 end;%if (flag_disp);
 
 %%%%%%%%;
-if (flag_verbose); disp(sprintf(' %% ')); end;
-if (flag_verbose); disp(sprintf(' %% We divide Up99 data into three continents. ;')); end;
-dir_trunk = dir_trunk;
-mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
-n_continent = max(mr_Up99_p01_continent_)+1; %<-- continent index is zero-based. ;
-mr_Up99_p01_continent_pc__ = zeros(n_patient_Up99,n_continent);
-for ncontinent=0:n_continent-1;
-mr_Up99_p01_continent_pc__(:,1+ncontinent) = (mr_Up99_p01_continent_==ncontinent);
-end;%for ncontinent=0:n_continent-1;
-%%%%%%%%;
-if (flag_verbose); disp(sprintf(' %% ')); end;
-if (flag_verbose); disp(sprintf(' %% We divide Up05 data into three continents. ;')); end;
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
-mr_Up05_p01_continent_ = textread(sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
-n_continent = max(mr_Up05_p01_continent_)+1; %<-- continent index is zero-based. ;
-mr_Up05_p01_continent_pc__ = zeros(n_patient_Up05,n_continent);
-for ncontinent=0:n_continent-1;
-mr_Up05_p01_continent_pc__(:,1+ncontinent) = (mr_Up05_p01_continent_==ncontinent);
-end;%for ncontinent=0:n_continent-1;
+% if (flag_verbose); disp(sprintf(' %% ')); end;
+% if (flag_verbose); disp(sprintf(' %% We divide Up99 data into three continents. ;')); end;
+% % dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+% mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
+% n_continent = max(mr_Up99_p01_continent_)+1; %<-- continent index is zero-based. ;
+% mr_Up99_p01_continent_pc__ = zeros(n_patient_Up99,n_continent);
+% for ncontinent=0:n_continent-1;
+% mr_Up99_p01_continent_pc__(:,1+ncontinent) = (mr_Up99_p01_continent_==ncontinent);
+% end;%for ncontinent=0:n_continent-1;
+% %%%%%%%%;
+% if (flag_verbose); disp(sprintf(' %% ')); end;
+% if (flag_verbose); disp(sprintf(' %% We divide Up05 data into three continents. ;')); end;
+% % dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+% mr_Up05_p01_continent_ = textread(sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
+% n_continent = max(mr_Up05_p01_continent_)+1; %<-- continent index is zero-based. ;
+% mr_Up05_p01_continent_pc__ = zeros(n_patient_Up05,n_continent);
+% for ncontinent=0:n_continent-1;
+% mr_Up05_p01_continent_pc__(:,1+ncontinent) = (mr_Up05_p01_continent_==ncontinent);
+% end;%for ncontinent=0:n_continent-1;
 %%%%%%%%;
 
 %%%%%%%%;
@@ -345,7 +345,7 @@ str_prefix = 'test2mds_maf01';
 gamma = 0.05;
 n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
 parameter_Up99 = struct('type','parameter');
-parameter_Up99.slurm_memdecl = Jeremy_GB; %<-- maybe this should be increased?
+parameter_Up99.slurm_memdecl = memory_GB; %<-- this may need to be inreased
 parameter_Up99.dir_code = dir_code;
 parameter_Up99.dir_trunk = dir_trunk_Up99;
 parameter_Up99.str_lak_vs_dex = str_lak_vs_dex;
@@ -379,8 +379,8 @@ flag_calc = 1;
 if flag_calc;
 
 pca_rank = 2;
-%p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_);
-p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_);
+p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_);
+% p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_);
 AZnV_DandX_Up99_p01_pnt___ = zeros(dataset_{1+ndataset_Up99}.n_patient,pca_rank,n_p_threshold);
 %%%%%%%%;
 for np_threshold=0:n_p_threshold-1;
@@ -398,6 +398,7 @@ parameter_DandX_Up99_p01 = parameter_Up99;
 parameter_DandX_Up99_p01.flag_force_create = 0;
 parameter_DandX_Up99_p01.str_A_p = str_Up99_A_p_p01;
 parameter_DandX_Up99_p01.str_name_s0000 = sprintf('pca_Up99t%s_DandX_p01',str_p_threshold);
+parameter_DandX_Up99_p01.slurm_memdecl = memory_GB;
 tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16 ...')); end;
 [ ...
  parameter_DandX_Up99_p01 ...
@@ -420,27 +421,74 @@ AZnV_DandX_Up99_p01_pnt___(:,:,1+np_threshold) = tmp_AZnV_DandX_Up99_p01_;
 end;%for np_threshold=0:n_p_threshold-1;
 %%%%%%%%;
 
-nf=0;
-platform = 'rusty';
-if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
-if (strcmp(platform,'access1')); str_home = 'data'; end;
-if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
-if (strcmp(platform,'eval1')); str_home = 'home'; end;
-if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
-dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
-mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot first two PCs and color by continent label at p<0.05 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+addpath '/home/jelman/Github/isosplit5/matlab'
+% Set filenames of case/control PCs
+pca_cases_fname = sprintf('%s/dir_Up99/dir_test2mds_maf01_analyze/dir_test2mds_maf01_dex_p01_D_m2r1_g050/dir_pca/dir_pca_mda/pca_proj_D_Up99t05_DandX_p01_k2_B44_AnV_.mda',dir_trunk);
+pca_ctrls_fname = sprintf('%s/dir_Up99/dir_test2mds_maf01_analyze/dir_test2mds_maf01_dex_p01_D_m2r1_g050/dir_pca/dir_pca_mda/pca_proj_D_Up99t05_DandX_p01_k2_B44_ZnV_.mda',dir_trunk);
+
+% Get PCs of cases and add index
+pca_cases = mda_read_r8(pca_cases_fname);
+idx_cases = find(pca_cases(:,1));
+pca_cases = pca_cases(idx_cases, :);
+pca_cases = [pca_cases idx_cases ones(length(idx_cases),1)];
+% Get PCs of controls and add index
+pca_ctrls = mda_read_r8(pca_ctrls_fname);
+idx_ctrls = find(pca_ctrls(:,1));
+pca_ctrls = pca_ctrls(idx_ctrls, :);
+pca_ctrls = [pca_ctrls idx_ctrls zeros(length(idx_ctrls),1)];
+% Concat cases and controls, sort by idx
+pca_all = [pca_cases; pca_ctrls];
+pca_all = sortrows(pca_all, 3);
+
+% Get cluster labels using isosplit
+[labels_out_all] = isosplit5_mex(pca_all(:,1).');
+% Name clusters based on size (e.g., cluster 1 has most individuals)
+[clustcounts_n, clustcounts_idx] = sort(groupcounts(reshape(labels_out_all, [], 1)), 'descend');
+orig_labels_out = labels_out_all;
+labels_out_all = clustcounts_idx(orig_labels_out);
+
+% % Plot PCs colored by case/control status
+% gscatter(pca_all(:,1), pca_all(:,2), {labels_out_all, pca_all(:,4)})
+% Set filename of fam file
+fam_fname = dataset_{1}.fname_famext;
+fam = readtable(fam_fname, 'Delimiter', '\t', 'FileType', 'delimitedtext');
+% Concatenate subject ID, cluster number, case-control status
+subjectClusters = [table2cell(fam(:, 2)) num2cell(labels_out_all) num2cell(pca_all(:,4)), num2cell(pca_all(:,1:2];
+% write out
+clust_fname = sprintf('%s/subjectClusterAssignments_PC0.txt', dir_trunk);
+writecell(subjectClusters,clust_fname,'Delimiter','\t');
+% Write out 0-based continent labels to use when searching for second bicluster
+writematrix(labels_out_all - 1, sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
+writematrix(labels_out_all - 1, sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
+% nf=0;
+
+% platform = 'rusty';
+% if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
+% if (strcmp(platform,'access1')); str_home = 'data'; end;
+% if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
+% if (strcmp(platform,'eval1')); str_home = 'home'; end;
+% if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
+% dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+% dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
+% mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
+mr_Up99_p01_continent_ = labels_out_all;
 
 fname_fig_pre = sprintf('%s/pca_proj_D_Up99txx_DandX_p01_k22_B44_AZnV_',dir_jpg); %<-- fname_fig_pre for coarse resolution of p-value-threshold. ;
 %fname_fig_pre = sprintf('%s/pca_proj_D_Up99t6x_DandX_p01_k22_B44_AZnV_',dir_jpg); %<-- fname_fig_pre for finer resolution. ;
-fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
-fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
+fname_fig_jpg = sprintf('%s_RGB.jpg',fname_fig_pre);
+fname_fig_eps = sprintf('%s_RGB.eps',fname_fig_pre);
 %%%%%%%%;
 dir_pca_tmp = sprintf('%s/dir_Up99/dir_test2mds_maf01_analyze/dir_test2mds_maf01_dex_p01_D_m2r1_g050/dir_pca/dir_pca_mda',dir_trunk);
 p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_); %<-- coarse resolution of p-value-threshold. ;
 %p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_); %<-- finer resolution. ;
 figure(1+nf);nf=nf+1;clf;figbig;fig80s;
 markersize_use = 8;
+cmap = brewermap(3, 'Set1');
 p_row = 4; p_col = ceil(n_p_threshold/p_row); np=0;
 for np_threshold=0:n_p_threshold-1;
 p_threshold = p_threshold_(1+np_threshold);
@@ -452,9 +500,10 @@ if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
 tmp_AnV_txx__ = mda_read_r8(tmp_fname_AnV_txx);
 tmp_ZnV_txx__ = mda_read_r8(tmp_fname_ZnV_txx);
 tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
-scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled');
+colormap(cmap);
+scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_, 'filled','MarkerEdgeColor','k');
 end;%if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
-xlabel('pc0');ylabel('pc1');title(sprintf('p<=%+0.4f',p_threshold));
+xlabel('PC1');ylabel('PC2');title(sprintf('p<=%0.2f',p_threshold));
 end;%for np_threshold=0:n_p_threshold-1;
 %%%%%%%%;
 sgtitle(fname_fig_pre,'Interpreter','none');
