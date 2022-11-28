@@ -8,7 +8,7 @@ if (flag_verbose); disp(sprintf(' %% Testing a version of xxxcluster_fromdisk_uA
 if (flag_verbose); disp(sprintf(' %% with a modified maf_lo_threshold. ;')); end;
 if (flag_verbose); disp(sprintf(' %% First running test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16. ;')); end;
 dir_trunk = sprintf('%s/dir_test_xxxcluster_fromdisk_ver16',pwd);
-test_stripped_xxxcluster_fromdisk_ver16(struct('flag_verbose',0));
+% test_stripped_xxxcluster_fromdisk_ver16(struct('flag_verbose',0));
 if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% Now running xxxcluster_fromdisk_uADZSZDA_ver16_dr_0 on same files. ;')); end;
 if (flag_verbose); disp(sprintf(' %% Note that, this time, we return the ''parameter'' structure. ;')); end;
@@ -16,14 +16,17 @@ if (flag_verbose); disp(sprintf(' %% We will later alter this structure to run a
 if (flag_verbose); disp(sprintf(' %% on a subset of the snps (selected based on minor-allele-frequency). ;')); end;
 parameter = struct('type','parameter');
 parameter.flag_verbose = 1;
-parameter.dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB';
+parameter.dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1/dir_Up05';
 parameter.study_name_of_branch_s_ = {''};
 parameter.study_name_without_extension_s_ = {'ukb_imp_allchr_ADCaseControls_p05'};
-parameter.mds_name_plus_extension_s_ = {'/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_imp_allchr_ADCaseControls_MDS2.tsv'};
-% parameter.ent_cutoff = 0.0045022835561375; %<-- test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16;
+parameter.mds_name_plus_extension_s_ = {'/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1/ukb_imp_allchr_ADCaseControls_MDS2.tsv'};
+parameter.ent_cutoff = .15; %<-- test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16;
 parameter.str_output_prefix = 'test2mds'; 
-parameter.mss_cutoff = .1;
+parameter.mss_cutoff = .15;
 parameter.n_shuffle = 128;
+parameter.maf_cutoff = 0.01;
+parameter.slurm_memdecl = 128;
+parameter.maf_lo_threshold = 0.01;
 parameter = xxxcluster_fromdisk_uADZSZDA_ver16_dr_0(parameter);
 if (flag_verbose); disp(sprintf(' %% ;')); end;
 
@@ -60,7 +63,7 @@ if (flag_verbose); disp(sprintf(' %% First we copy the parameter structure, ;'))
 if (flag_verbose); disp(sprintf(' %% and specify the new maf_lo_threshold ;')); end;
 if (flag_verbose); disp(sprintf(' %% (which was previously 0.10 by default). ;')); end;
 parameter_maflo = parameter;
-parameter_maflo.maf_lo_threshold = 0.01; %<-- In a real data-set you might replace bim_maf_p35 with, say, 0.05. ;
+% parameter_maflo.maf_lo_threshold = 0.01; %<-- In a real data-set you might replace bim_maf_p35 with, say, 0.05. ;
 for nshuffle=0:parameter_maflo.n_shuffle-1+1;
 parameter_maflo.nshuffle = nshuffle;
 parameter_maflo = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_maflo);
