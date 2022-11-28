@@ -1,5 +1,11 @@
 clear;
 %%%%%%%%;
+% Clustering to assign continent labels requires isosplit. This can be ;
+% downloaded and installed from
+% https://github.com/flatironinstitute/isosplit5 ;
+%%%%%%%%;
+
+%%%%%%%%;
 % Here we set the matlab path and define str_home for naming. ;
 %%%%%%%%;
 % platform = 'rusty';
