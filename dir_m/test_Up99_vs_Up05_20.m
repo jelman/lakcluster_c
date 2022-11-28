@@ -2,14 +2,14 @@ clear;
 %%%%%%%%;
 % Here we set the matlab path and define str_home for naming. ;
 %%%%%%%%;
-platform = 'rusty';
-if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
-if (strcmp(platform,'access1')); str_home = 'data'; end;
-if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
-if (strcmp(platform,'eval1')); str_home = 'home'; end;
-if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
-%%%%%%%%;
-run(sprintf('/%s/rangan/dir_bcc/dir_lakcluster_c_dev/dir_m/setup_0',str_home)); %<-- set up the paths. ;
+% platform = 'rusty';
+% if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
+% if (strcmp(platform,'access1')); str_home = 'data'; end;
+% if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
+% if (strcmp(platform,'eval1')); str_home = 'home'; end;
+% if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
+% %%%%%%%%;
+run('/home/jelman/Github/lakcluster_c/dir_m/setup_0'); %<-- set up the paths. ;
 flag_verbose = 1;
 flag_disp = 1+flag_verbose; nf=0;
 flag_replot = 0;
@@ -17,37 +17,35 @@ if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% Assume path is set using dir_lakcluster_c/dir_m/setup_0.m. ;')); end;
 
 if (flag_verbose); disp(sprintf(' %% Comparing Up99 with Up05 data. ;')); end;
-Jeremy_GB = 48; %<-- maybe this should be increased? ;
-if (flag_verbose); disp(sprintf(' %% trying with Jeremy_GB %d ;',Jeremy_GB)); end;
+memory_GB = 128; %<-- maybe this should be increased? ;
+if (flag_verbose); disp(sprintf(' %% trying with memory_GB %d ;',memory_GB)); end;
 
-dir_code = sprintf('/%s/rangan/dir_bcc/dir_lakcluster_c_dev',str_home);
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+dir_code = '/home/jelman/Github/lakcluster_c';
+dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1';
 dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
 if ~exist(dir_jpg,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg)); mkdir(dir_jpg); end;
 
-n_dataset = 2; %<-- load two different datasets. ;
-str_dataset_ = {'Up99','Up05'};
-dataset_ = cell(n_dataset,1);
-for ndataset=0:n_dataset-1;
-dataset = struct('type','dataset');
-dataset.str_dataset = str_dataset_{1+ndataset};
-dataset.dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman/dir_%s',str_home,dataset.str_dataset);
-dataset.str_prefix = 'test2mds_maf01';
-dataset.dir_0in = sprintf('%s/dir_%s',dataset.dir_trunk,dataset.str_prefix);
+
+dataset_Up05 = cell(n_dataset,1);
+dataset_Up05 = struct('type','dataset');
+dataset_Up05.str_dataset = 'Up05';
+dataset_Up05.dir_trunk = sprintf('%s/dir_%s',dir_trunk,dataset.str_dataset);
+dataset_Up05.str_prefix = 'test2mds_maf01';
+dataset_Up05.dir_0in = sprintf('%s/dir_%s',dataset.dir_trunk,dataset.str_prefix);
 %%%%%%%%;
-dataset.fname_bimext = sprintf('%s/%s_bim.ext',dataset.dir_0in,dataset.str_prefix);
-if ~exist(dataset.fname_bimext,'file');
-dataset.fname_bimext = sprintf('%s/%s_bim.ext',dataset.dir_0in,dataset.str_prefix);
+dataset_Up05.fname_bimext = sprintf('%s/%s_bim.ext',dataset.dir_0in,dataset.str_prefix);
+if ~exist(dataset_Up05.fname_bimext,'file');
+dataset_Up05.fname_bimext = sprintf('%s/%s_bim.ext',dataset_Up05.dir_0in,dataset.str_prefix);
 end;%if ~exist(dataset.fname_bimext,'file');
-if ~exist(dataset.fname_bimext,'file');
-dataset.fname_bimext = sprintf('%s/test0mds_maf01_bim.ext',dataset.dir_0in);
+if ~exist(dataset_Up05.fname_bimext,'file');
+dataset_Up05.fname_bimext = sprintf('%s/test2mds_maf01_bim.ext',dataset_Up05.dir_0in);
 end;%if ~exist(dataset.fname_bimext,'file');
-if ~exist(dataset.fname_bimext,'file');
-dataset.fname_bimext = sprintf('%s/%s_bim.ext',dataset.dir_0in,dataset.str_dataset);
+if ~exist(dataset_Up05.fname_bimext,'file');
+dataset_Up05.fname_bimext = sprintf('%s/%s_bim.ext',dataset_Up05.dir_0in,dataset_Up05.str_dataset);
 end;%if ~exist(dataset.fname_bimext,'file');
 tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% load_bimext_ver1 ...')); end;
 [ ...
-,dataset.n_snp ...
+,dataset_Up05.n_snp ...
 ,dataset.bim_khr_ ...
 ,dataset.bim_vid_ ...
 ,dataset.bim_gdi_ ...
@@ -72,7 +70,7 @@ if ~exist(dataset.fname_famext,'file');
 dataset.fname_famext = sprintf('%s/%s_fam.ext',dataset.dir_0in,dataset.str_prefix);
 end;%if ~exist(dataset.fname_famext,'file');
 if ~exist(dataset.fname_famext,'file');
-dataset.fname_famext = sprintf('%s/test0mds_maf01_fam.ext',dataset.dir_0in);
+dataset.fname_famext = sprintf('%s/test2mds_maf01_fam.ext',dataset.dir_0in);
 end;%if ~exist(dataset.fname_famext,'file');
 if ~exist(dataset.fname_famext,'file');
 dataset.fname_famext = sprintf('%s/%s_fam.ext',dataset.dir_0in,dataset.str_dataset);
@@ -109,7 +107,7 @@ end;%for nd=0:1;
 
 for ndataset=0:n_dataset-1;
 parameter = struct('type','parameter');
-parameter.slurm_memdecl = Jeremy_GB; %<-- maybe this should be increased? ;
+parameter.slurm_memdecl = memory_GB; %<-- maybe this should be increased? ;
 parameter.dir_0in = dataset_{1+ndataset}.dir_0in;
 parameter.str_prefix = dataset_{1+ndataset}.str_prefix;
 tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% load_mx__from_parameter_ver0 ...')); end;
@@ -146,50 +144,50 @@ if (flag_verbose); disp(sprintf(' %% numel(index_Up05_setminus_cap_): %d',numel(
 pca_rank_use = 2; %<-- number of principal-components. ;
 maf_lo_threshold = 0.01; %<-- minor-allele-frequency lower bound. ;
 
-%%%%%%%%;
-% Set Up99_A_p_. ;
-%%%%%%%%;
-ndataset=ndataset_Up99;
-mx_tst__ = dataset_{1+ndataset}.mx__;
-tmp_parameter_tst = dataset_{1+ndataset}.parameter;
-if (flag_verbose); disp(sprintf(' %% tmp_parameter_tst.dir_0in: %s',tmp_parameter_tst.dir_0in)); end;
-if (flag_verbose); disp(sprintf(' %% tmp_parameter_tst.str_prefix: %s',tmp_parameter_tst.str_prefix)); end;
-tmp_parameter_tst.dir_code = sprintf('/%s/rangan/dir_bcc/dir_lakcluster_c_dev',str_home);
-tmp_parameter_tst.maf_lo_threshold = maf_lo_threshold;
-tmp_parameter_tst.maf_hi_threshold = 0.50;
-tmp_parameter_tst.gamma = 0.05; %<-- not used for pca calculation. ;
-tmp_parameter_tst.flag_verbose = 0;
-tmp_parameter_tst.flag_force_create = 0;
-pca_rank = pca_rank_use;
-mr_A_ori_tst_ = mx_tst__.mr_A_full_;
-mr_Z_ori_tst_ = mx_tst__.mr_Z_full_;
-mc_A_ori_tst_ = mx_tst__.mc_A_;
-pca_str_infix_tst='D_trnUp99_tstUp05_nix_p01';
-%%%%;
-parameter_A_p_p01 = tmp_parameter_tst;
-pca_A_p_str_infix = 'full';
-parameter_A_p_p01.str_name_s0000 = 'A_p_p01';
-parameter_A_p_p01.flag_force_create = 0;
-tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16 ...')); end;
-[ ...
- parameter_A_p_p01 ...
-,str_Up99_A_p_p01 ...
-] = ...
-xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16( ...
-parameter_A_p_p01 ...
-,{ mr_A_ori_tst_ } ...
-,{ mr_Z_ori_tst_ } ...
-,mc_A_ori_tst_ ...
-,pca_A_p_str_infix ...
-);
-tmp_Up99_A_p_p01_ = mda_read_r8(str_Up99_A_p_p01); 
-tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16: %0.6fs',tmp_t)); end;
-if (flag_disp>1);
-figure(1+nf);nf=nf+1;clf;figsml;
-plot(tmp_Up99_A_p_p01_);
-xlabel('pcol');ylabel('A_p','Interpreter','none');
-title(str_Up99_A_p_p01,'Interpreter','none');
-end;%if (flag_disp);
+% %%%%%%%%;
+% % Set Up99_A_p_. ;
+% %%%%%%%%;
+% ndataset=ndataset_Up99;
+% mx_tst__ = dataset_{1+ndataset}.mx__;
+% tmp_parameter_tst = dataset_{1+ndataset}.parameter;
+% if (flag_verbose); disp(sprintf(' %% tmp_parameter_tst.dir_0in: %s',tmp_parameter_tst.dir_0in)); end;
+% if (flag_verbose); disp(sprintf(' %% tmp_parameter_tst.str_prefix: %s',tmp_parameter_tst.str_prefix)); end;
+% tmp_parameter_tst.dir_code = dir_code;
+% tmp_parameter_tst.maf_lo_threshold = maf_lo_threshold;
+% tmp_parameter_tst.maf_hi_threshold = 0.50;
+% tmp_parameter_tst.gamma = 0.05; %<-- not used for pca calculation. ;
+% tmp_parameter_tst.flag_verbose = 0;
+% tmp_parameter_tst.flag_force_create = 0;
+% pca_rank = pca_rank_use;
+% mr_A_ori_tst_ = mx_tst__.mr_A_full_;
+% mr_Z_ori_tst_ = mx_tst__.mr_Z_full_;
+% mc_A_ori_tst_ = mx_tst__.mc_A_;
+% pca_str_infix_tst='D_trnUp99_tstUp05_nix_p01';
+% %%%%;
+% parameter_A_p_p01 = tmp_parameter_tst;
+% pca_A_p_str_infix = 'full';
+% parameter_A_p_p01.str_name_s0000 = 'A_p_p01';
+% parameter_A_p_p01.flag_force_create = 0;
+% tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16 ...')); end;
+% [ ...
+%  parameter_A_p_p01 ...
+% ,str_Up99_A_p_p01 ...
+% ] = ...
+% xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16( ...
+% parameter_A_p_p01 ...
+% ,{ mr_A_ori_tst_ } ...
+% ,{ mr_Z_ori_tst_ } ...
+% ,mc_A_ori_tst_ ...
+% ,pca_A_p_str_infix ...
+% );
+% tmp_Up99_A_p_p01_ = mda_read_r8(str_Up99_A_p_p01); 
+% tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16: %0.6fs',tmp_t)); end;
+% if (flag_disp>1);
+% figure(1+nf);nf=nf+1;clf;figsml;
+% plot(tmp_Up99_A_p_p01_);
+% xlabel('pcol');ylabel('A_p','Interpreter','none');
+% title(str_Up99_A_p_p01,'Interpreter','none');
+% end;%if (flag_disp);
 
 %%%%%%%%;
 % Set Up05_A_p_. ;
@@ -199,7 +197,7 @@ mx_tst__ = dataset_{1+ndataset}.mx__;
 tmp_parameter_tst = dataset_{1+ndataset}.parameter;
 if (flag_verbose); disp(sprintf(' %% tmp_parameter_tst.dir_0in: %s',tmp_parameter_tst.dir_0in)); end;
 if (flag_verbose); disp(sprintf(' %% tmp_parameter_tst.str_prefix: %s',tmp_parameter_tst.str_prefix)); end;
-tmp_parameter_tst.dir_code = sprintf('/%s/rangan/dir_bcc/dir_lakcluster_c_dev',str_home);
+tmp_parameter_tst.dir_code = dir_code;
 tmp_parameter_tst.maf_lo_threshold = maf_lo_threshold;
 tmp_parameter_tst.maf_hi_threshold = 0.50;
 tmp_parameter_tst.gamma = 0.05; %<-- not used for pca calculation. ;
@@ -236,27 +234,27 @@ xlabel('pcol');ylabel('A_p','Interpreter','none');
 title(str_Up05_A_p_p01,'Interpreter','none');
 end;%if (flag_disp);
 
-%%%%%%%%;
-if (flag_verbose); disp(sprintf(' %% ')); end;
-if (flag_verbose); disp(sprintf(' %% We divide Up99 data into three continents. ;')); end;
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
-mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
-n_continent = max(mr_Up99_p01_continent_)+1; %<-- continent index is zero-based. ;
-mr_Up99_p01_continent_pc__ = zeros(n_patient_Up99,n_continent);
-for ncontinent=0:n_continent-1;
-mr_Up99_p01_continent_pc__(:,1+ncontinent) = (mr_Up99_p01_continent_==ncontinent);
-end;%for ncontinent=0:n_continent-1;
-%%%%%%%%;
-if (flag_verbose); disp(sprintf(' %% ')); end;
-if (flag_verbose); disp(sprintf(' %% We divide Up05 data into three continents. ;')); end;
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
-mr_Up05_p01_continent_ = textread(sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
-n_continent = max(mr_Up05_p01_continent_)+1; %<-- continent index is zero-based. ;
-mr_Up05_p01_continent_pc__ = zeros(n_patient_Up05,n_continent);
-for ncontinent=0:n_continent-1;
-mr_Up05_p01_continent_pc__(:,1+ncontinent) = (mr_Up05_p01_continent_==ncontinent);
-end;%for ncontinent=0:n_continent-1;
-%%%%%%%%;
+% %%%%%%%%;
+% if (flag_verbose); disp(sprintf(' %% ')); end;
+% if (flag_verbose); disp(sprintf(' %% We divide Up99 data into three continents. ;')); end;
+% dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+% mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
+% n_continent = max(mr_Up99_p01_continent_)+1; %<-- continent index is zero-based. ;
+% mr_Up99_p01_continent_pc__ = zeros(n_patient_Up99,n_continent);
+% for ncontinent=0:n_continent-1;
+% mr_Up99_p01_continent_pc__(:,1+ncontinent) = (mr_Up99_p01_continent_==ncontinent);
+% end;%for ncontinent=0:n_continent-1;
+% %%%%%%%%;
+% if (flag_verbose); disp(sprintf(' %% ')); end;
+% if (flag_verbose); disp(sprintf(' %% We divide Up05 data into three continents. ;')); end;
+% dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+% mr_Up05_p01_continent_ = textread(sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
+% n_continent = max(mr_Up05_p01_continent_)+1; %<-- continent index is zero-based. ;
+% mr_Up05_p01_continent_pc__ = zeros(n_patient_Up05,n_continent);
+% for ncontinent=0:n_continent-1;
+% mr_Up05_p01_continent_pc__(:,1+ncontinent) = (mr_Up05_p01_continent_==ncontinent);
+% end;%for ncontinent=0:n_continent-1;
+% %%%%%%%%;
 
 %%%%%%%%;
 % Now we load Kunkle_AD_GWAS_pvals.txt ;
@@ -335,76 +333,76 @@ end;%for ntest=0:n_test-1;
 
 if (flag_verbose); disp(sprintf(' %% numel(intersect(dataset_{1+ndataset_Up99}.bim_vid_(1+efind(tmp_mc_)),dataset_{1+ndataset_Up05}.bim_vid_)): %d/%d',numel(intersect(dataset_{1+ndataset_Up99}.bim_vid_(1+efind(Up99_bim_ADp_<=0.05)),dataset_{1+ndataset_Up05}.bim_vid_)),numel(unique(dataset_{1+ndataset_Up05}.bim_vid_)))); end;
 
-flag_calc = 1;
-if flag_calc;
-%%%%%%%%;
-% Now run a simple biclustering for the Up99 data-set. ;
-%%%%%%%%;
-str_lak_vs_dex = 'dex';
-str_prefix = 'test2mds_maf01';
-gamma = 0.05;
-n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
-parameter_Up99 = struct('type','parameter');
-parameter_Up99.slurm_memdecl = Jeremy_GB; %<-- maybe this should be increased?
-parameter_Up99.dir_code = dir_code;
-parameter_Up99.dir_trunk = dir_trunk_Up99;
-parameter_Up99.str_lak_vs_dex = str_lak_vs_dex;
-parameter_Up99.str_prefix = str_prefix;
-parameter_Up99.gamma = gamma;
-parameter_Up99.n_mds = n_mds_0in;
-parameter_Up99.n_mds_repl = n_mds_repl;
-parameter_Up99.ij_mds_use_ = ij_mds_use_;
-parameter_Up99.flag_force_create = 0; %<-- reload previous run. ;
-parameter_Up99.flag_verbose = max(0,flag_verbose-1);
-parameter_Up99.maf_lo_threshold = maf_lo_threshold;
-parameter_Up99.n_shuffle = 4;
-parameter_Up99.dir_0in = sprintf('%s/dir_%s',parameter_Up99.dir_trunk,parameter_Up99.str_prefix);
-for nshuffle=1:parameter_Up99.n_shuffle;
-parameter_Up99.nshuffle = nshuffle;
-parameter_Up99 = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_Up99);
-end;%for nshuffle=0:parameter_Up99.n_shuffle;
-parameter_Up99.nshuffle = 0;
-parameter_Up99 = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_Up99);
-%%%%%%%%;
-% Now run Z_imax_zerobased to pick out an internal iteration of interest. ;
-% This particular function should be within /dir_lakcluster_c/dir_m_dependencies. ;
-%%%%%%%%;
-tmp_Z_ = trace_Up99__.ZR_s0000_; %<-- this is the z-score for the traces of the original data (i.e., nshuffle==0). ;
-tmp_Z_ = trace_Up99__.ZR_is__(:,1+0); %<-- this is the same as the previous definition. ;
-tmp_Z_min = -Inf; %<-- The lowest z-score to consider, putting in -Inf will consider all z-scores. ;
-[tmp_Z_max,tmp_Z_max_index] = Z_imax_zerobased(flag_verbose,tmp_Z_,tmp_Z_min);
-%%%%;
-% Here we visualize the results. ;
-% We put a little red circle at the maximum value (picked out by Z_imax_zerobased). ;
-%%%%;
-trace_Up99__ = load_trace__from_dir_ver0(parameter_Up99.dir_out_trace);
-tmp_r_eli_ = trace_Up99__.r_rem_s0000_(1+0) - trace_Up99__.r_rem_s0000_ ;
-figure(1+nf);nf=nf+1;clf;figmed;
-linewidth_big = 3;
-linewidth_sml = 1;
-subplot(1,2,1);
-hold on;
-plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
-plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml);
-plot(trace_Up99__.niter_s0000_(1+tmp_Z_max_index),trace_Up99__.ZR_is__(1+tmp_Z_max_index,1+0),'ro','MarkerFaceColor','r','MarkerSize',16);
-hold off;
-xlim([0,trace_Up99__.niter_is__(end,1+0)+1]); xlabel('niteration'); ylim([-10,+10]); ylabel('ZR');
-subplot(1,2,2);
-hold on;
-plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
-plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml);
-plot(tmp_r_eli_(1+tmp_Z_max_index),trace_Up99__.ZR_is__(1+tmp_Z_max_index,1+0),'ro','MarkerFaceColor','r','MarkerSize',16);
-hold off;
-xlim([min(tmp_r_eli_),max(tmp_r_eli_)]); xlabel('rows eliminated'); ylim([-10,+10]); ylabel('ZR');
-%%%%;
-fname_mr_A_full = sprintf('%s/%s_mr_A_full.b16',parameter_Up99.dir_0in,parameter_Up99.str_prefix);
-fname_mr_Z_full = sprintf('%s/%s_mr_Z_full.b16',parameter_Up99.dir_0in,parameter_Up99.str_prefix);
-fname_mc_A = sprintf('%s/%s_mc_A.b16',parameter_Up99.dir_0in,parameter_Up99.str_prefix);
-mr_A_ori_Up99_ = binary_uncompress(fname_mr_A_full)>0; %<-- thresholded to avoid negative values. ;
-mr_Z_ori_Up99_ = binary_uncompress(fname_mr_Z_full)>0; %<-- thresholded to avoid negative values. ;
-mc_A_ori_Up99_ = binary_uncompress(fname_mc_A)>0; %<-- thresholded to avoid negative values. ;
-%%%%%%%%;
-end;%if flag_calc;
+% flag_calc = 1;
+% if flag_calc;
+% %%%%%%%%;
+% % Now run a simple biclustering for the Up99 data-set. ;
+% %%%%%%%%;
+% str_lak_vs_dex = 'dex';
+% str_prefix = 'test2mds_maf01';
+% gamma = 0.05;
+% n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
+% parameter_Up99 = struct('type','parameter');
+% parameter_Up99.slurm_memdecl = memory_GB; %<-- maybe this should be increased?
+% parameter_Up99.dir_code = dir_code;
+% parameter_Up99.dir_trunk = dir_trunk_Up99;
+% parameter_Up99.str_lak_vs_dex = str_lak_vs_dex;
+% parameter_Up99.str_prefix = str_prefix;
+% parameter_Up99.gamma = gamma;
+% parameter_Up99.n_mds = n_mds_0in;
+% parameter_Up99.n_mds_repl = n_mds_repl;
+% parameter_Up99.ij_mds_use_ = ij_mds_use_;
+% parameter_Up99.flag_force_create = 0; %<-- reload previous run. ;
+% parameter_Up99.flag_verbose = max(0,flag_verbose-1);
+% parameter_Up99.maf_lo_threshold = maf_lo_threshold;
+% parameter_Up99.n_shuffle = 4;
+% parameter_Up99.dir_0in = sprintf('%s/dir_%s',parameter_Up99.dir_trunk,parameter_Up99.str_prefix);
+% for nshuffle=1:parameter_Up99.n_shuffle;
+% parameter_Up99.nshuffle = nshuffle;
+% parameter_Up99 = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_Up99);
+% end;%for nshuffle=0:parameter_Up99.n_shuffle;
+% parameter_Up99.nshuffle = 0;
+% parameter_Up99 = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_Up99);
+% %%%%%%%%;
+% % Now run Z_imax_zerobased to pick out an internal iteration of interest. ;
+% % This particular function should be within /dir_lakcluster_c/dir_m_dependencies. ;
+% %%%%%%%%;
+% tmp_Z_ = trace_Up99__.ZR_s0000_; %<-- this is the z-score for the traces of the original data (i.e., nshuffle==0). ;
+% tmp_Z_ = trace_Up99__.ZR_is__(:,1+0); %<-- this is the same as the previous definition. ;
+% tmp_Z_min = -Inf; %<-- The lowest z-score to consider, putting in -Inf will consider all z-scores. ;
+% [tmp_Z_max,tmp_Z_max_index] = Z_imax_zerobased(flag_verbose,tmp_Z_,tmp_Z_min);
+% %%%%;
+% % Here we visualize the results. ;
+% % We put a little red circle at the maximum value (picked out by Z_imax_zerobased). ;
+% %%%%;
+% trace_Up99__ = load_trace__from_dir_ver0(parameter_Up99.dir_out_trace);
+% tmp_r_eli_ = trace_Up99__.r_rem_s0000_(1+0) - trace_Up99__.r_rem_s0000_ ;
+% figure(1+nf);nf=nf+1;clf;figmed;
+% linewidth_big = 3;
+% linewidth_sml = 1;
+% subplot(1,2,1);
+% hold on;
+% plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
+% plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml);
+% plot(trace_Up99__.niter_s0000_(1+tmp_Z_max_index),trace_Up99__.ZR_is__(1+tmp_Z_max_index,1+0),'ro','MarkerFaceColor','r','MarkerSize',16);
+% hold off;
+% xlim([0,trace_Up99__.niter_is__(end,1+0)+1]); xlabel('niteration'); ylim([-10,+10]); ylabel('ZR');
+% subplot(1,2,2);
+% hold on;
+% plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
+% plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml);
+% plot(tmp_r_eli_(1+tmp_Z_max_index),trace_Up99__.ZR_is__(1+tmp_Z_max_index,1+0),'ro','MarkerFaceColor','r','MarkerSize',16);
+% hold off;
+% xlim([min(tmp_r_eli_),max(tmp_r_eli_)]); xlabel('rows eliminated'); ylim([-10,+10]); ylabel('ZR');
+% %%%%;
+% fname_mr_A_full = sprintf('%s/%s_mr_A_full.b16',parameter_Up99.dir_0in,parameter_Up99.str_prefix);
+% fname_mr_Z_full = sprintf('%s/%s_mr_Z_full.b16',parameter_Up99.dir_0in,parameter_Up99.str_prefix);
+% fname_mc_A = sprintf('%s/%s_mc_A.b16',parameter_Up99.dir_0in,parameter_Up99.str_prefix);
+% mr_A_ori_Up99_ = binary_uncompress(fname_mr_A_full)>0; %<-- thresholded to avoid negative values. ;
+% mr_Z_ori_Up99_ = binary_uncompress(fname_mr_Z_full)>0; %<-- thresholded to avoid negative values. ;
+% mc_A_ori_Up99_ = binary_uncompress(fname_mc_A)>0; %<-- thresholded to avoid negative values. ;
+% %%%%%%%%;
+% end;%if flag_calc;
 
 flag_calc=1;
 if flag_calc;
@@ -424,7 +422,7 @@ str_prefix = 'test2mds_maf01';
 gamma = 0.05;
 n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
 parameter_Up05 = struct('type','parameter');
-parameter_Up05.slurm_memdecl = Jeremy_GB; %<-- maybe this should be increased?
+parameter_Up05.slurm_memdecl = memory_GB; %<-- maybe this should be increased?
 parameter_Up05.dir_code = dir_code;
 parameter_Up05.dir_trunk = dir_trunk_Up05;
 parameter_Up05.str_lak_vs_dex = str_lak_vs_dex;
@@ -437,22 +435,79 @@ parameter_Up05.flag_force_create = 0; %<-- reload previous run. ;
 parameter_Up05.flag_verbose = max(0,flag_verbose-1);
 parameter_Up05.maf_lo_threshold = maf_lo_threshold;
 parameter_Up05.str_mr_0in = 'continent1';
-parameter_Up05.n_shuffle = 128;
+parameter_Up05.n_shuffle = 500;
 parameter_Up05.dir_0in = sprintf('%s/dir_%s',parameter_Up05.dir_trunk,parameter_Up05.str_prefix);
 for nshuffle=1:parameter_Up05.n_shuffle;
 parameter_Up05.nshuffle = nshuffle;
 parameter_Up05 = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_Up05);
 end;%for nshuffle=0:parameter_Up05.n_shuffle;
-parameter_Up05.nshuffle = 0;
-parameter_Up05 = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_Up05);
-trace_Up05__ = load_trace__from_dir_ver0(parameter_Up05.dir_out_trace);
-parameter_Up05.flag_verbose = 1; parameter_Up05.niteration_al0 = 1;
-[~,p_all_out,p_avg_out,p_top_out] = p_from_trace__ver0(parameter_Up05,trace_Up05__);
 %%%%%%%%;
 end;%if flag_calc;
 
+% Load trace, get exclude mask for p-value calculation and Z-max
+% Pval: exclude bicluster with <5% of case population
+% Zmax: Exclude biclusters with <5% or >95% of case population
+trace_Up05__ = load_trace__from_dir_ver0(parameter_Up05.dir_out_trace);
+tmp_r_eli_ = trace_Up05__.r_rem_s0000_(1+0) - trace_Up05__.r_rem_s0000_ ;
+ncases = trace_Up05__.r_rem_s0000_(1+0);
+pval_mask = trace_Up05__.r_rem_s0000_/ncases > .05;
+Z_max_mask = (trace_Up05__.r_rem_s0000_/ncases > .05) & (trace_Up05__.r_rem_s0000_/ncases < .95);
+
+% Calculate p-value for trace
+parameter_Up05.flag_verbose = 1; 
+parameter_Up05.niteration_alo = 1;
+parameter_Up05.niteration_ahi = max(trace_Up05__.niter_s0000_(pval_mask))+1;
+[~,p_all_out,p_avg_out,p_top_out] = p_from_trace__ver0(parameter_Up05,trace_Up05__);
+
+%%%%%%%%;
+% Now run Z_imax_zerobased to pick out an internal iteration of interest. ;
+% This particular function should be within /dir_lakcluster_c/dir_m_dependencies. ;
+%%%%%%%%;
+tmp_Z_ = trace_Up05__.ZR_s0000_(Z_max_mask); %<-- this is the z-score for the traces of the original data (i.e., nshuffle==0). ;
+tmp_Z_ = trace_Up05__.ZR_is__(Z_max_mask,1+0); %<-- this is the same as the previous definition. ;
+tmp_Z_min = -Inf; %<-- The lowest z-score to consider, putting in -Inf will consider all z-scores. ;
+[tmp_Z_max,tmp_Z_max_index] = Z_imax_zerobased(flag_verbose,tmp_Z_,tmp_Z_min);
+%%%%;
+
+%%%%;
+% Here we visualize the traces. ;
+% We put a little red circle at the maximum value (picked out by Z_imax_zerobased). ;
+%%%%;
+figure(1+nf);nf=nf+1;clf;figmed;
+linewidth_big = 3;
+linewidth_sml = 1;
+subplot(1,2,1);
+hold on;
+plot(trace_Up05__.niter_s0000_(pval_mask),trace_Up05__.ZR_is__(pval_mask,2:end),'b-','LineWidth',linewidth_sml,'Color', [0 0 0 0.3]);
+plot(trace_Up05__.niter_s0000_(pval_mask),trace_Up05__.ZR_is__(pval_mask,1 + 0),'r-','LineWidth',linewidth_big);
+plot(trace_Up05__.niter_s0000_(1+tmp_Z_max_index),trace_Up05__.ZR_is__(1+tmp_Z_max_index,1+0),'ro','MarkerFaceColor','r','MarkerSize',10);
+hold off;
+xlim([0,max(trace_Up05__.niter_s0000_(pval_mask))+1]); xlabel('niteration'); ylim([-10,+10]); ylabel('ZR');
+subplot(1,2,2);
+hold on;
+plot(tmp_r_eli_(pval_mask),trace_Up05__.ZR_is__(pval_mask,2:end),'b-','LineWidth',linewidth_sml,'Color', [0 0 0 0.3]);
+plot(tmp_r_eli_(pval_mask),trace_Up05__.ZR_is__(pval_mask,1 + 0),'r-','LineWidth',linewidth_big);
+plot(tmp_r_eli_(1+tmp_Z_max_index),trace_Up05__.ZR_is__(1+tmp_Z_max_index,1+0),'ro','MarkerFaceColor','r','MarkerSize',10);
+hold off;
+xlim([min(tmp_r_eli_(pval_mask)),max(tmp_r_eli_(pval_mask))]); xlabel('rows eliminated'); ylim([-10,+10]); ylabel('ZR');
+%%%%;
+
+%%%%;
+% Here we visualize the scatter plots of cases and controls. ;
+% First plot shows iteration 0, second shows bicluster. ;
+%%%%;
+fname_mr_A_full = sprintf('%s/%s_mr_A_full.b16',parameter_Up05.dir_0in,parameter_Up05.str_prefix);
+fname_mr_Z_full = sprintf('%s/%s_mr_Z_full.b16',parameter_Up05.dir_0in,parameter_Up05.str_prefix);
+fname_mc_A = sprintf('%s/%s_mc_A.b16',parameter_Up05.dir_0in,parameter_Up05.str_prefix);
+mr_A_ori_Up05_ = binary_uncompress(fname_mr_A_full)>0; %<-- thresholded to avoid negative values. ;
+mr_Z_ori_Up05_ = binary_uncompress(fname_mr_Z_full)>0; %<-- thresholded to avoid negative values. ;
+mc_A_ori_Up05_ = binary_uncompress(fname_mc_A)>0; %<-- thresholded to avoid negative values. ;
+
+
+
+
 flag_calc = 1;
-if flag_calc;
+if flag_calc;    
 %%%%%%%%;
 % Now load the out_xdrop_a.txt file. ;
 %%%%%%%%;
@@ -497,7 +552,7 @@ end;%if ~exist(tmp_fname_xdrop,'file');
 % Just remember that these are all zero-based. ;
 %%%%%%%%;
 parameter_Up99_scramble_BC0 = struct('type','parameter');
-parameter_Up99_scramble_BC0.slurm_memdecl = Jeremy_GB;
+parameter_Up99_scramble_BC0.slurm_memdecl = memory_GB;
 parameter_Up99_scramble_BC0.dir_code = dir_code;
 parameter_Up99_scramble_BC0.dir_trunk = dir_trunk_Up99;
 parameter_Up99_scramble_BC0.str_lak_vs_dex = str_lak_vs_dex;
@@ -535,14 +590,14 @@ subplot(1,2,1);
 hold on;
 plot(trace_Up99__.niter_s0000_,ZR_scramble_BC0_,'g-','LineWidth',linewidth_big);
 plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
-plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml);
+plot(trace_Up99__.niter_s0000_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml,'Color', [0 0 0 0.3]);
 hold off;
 xlim([0,trace_Up99__.niter_is__(end,1+0)+1]); xlabel('niteration'); ylim([-10,+10]); ylabel('ZR');
 subplot(1,2,2);
 hold on;
 plot(tmp_r_eli_,ZR_scramble_BC0_,'g-','LineWidth',linewidth_big);
 plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
-plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml);
+plot(tmp_r_eli_,trace_Up99__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml,'Color', [0 0 0 0.3]);
 hold off;
 xlim([min(tmp_r_eli_),max(tmp_r_eli_)]); xlabel('rows eliminated'); ylim([-10,+10]); ylabel('ZR');
 %%%%;
