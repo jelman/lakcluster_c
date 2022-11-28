@@ -15,12 +15,15 @@ if (flag_verbose); disp(sprintf(' %% Note that, this time, we return the ''param
 if (flag_verbose); disp(sprintf(' %% We will later alter this structure to run a new analysis ;')); end;
 if (flag_verbose); disp(sprintf(' %% on a subset of the snps (selected based on minor-allele-frequency). ;')); end;
 parameter = struct('type','parameter');
-parameter.flag_verbose = 0;
-parameter.dir_trunk = dir_trunk;
-parameter.study_name_of_branch_s_ = {'dir_study00'};
-parameter.study_name_without_extension_s_ = {'study00'};
-parameter.mds_name_plus_extension_s_ = {'study00_mds_tsv.txt'};
-parameter.ent_cutoff = 0.0045022835561375; %<-- taken from test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16;
+parameter.flag_verbose = 1;
+parameter.dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB';
+parameter.study_name_of_branch_s_ = {''};
+parameter.study_name_without_extension_s_ = {'ukb_imp_allchr_ADCaseControls_p05'};
+parameter.mds_name_plus_extension_s_ = {'/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_imp_allchr_ADCaseControls_MDS2.tsv'};
+% parameter.ent_cutoff = 0.0045022835561375; %<-- test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16;
+parameter.str_output_prefix = 'test2mds'; 
+parameter.mss_cutoff = .1;
+parameter.n_shuffle = 128;
 parameter = xxxcluster_fromdisk_uADZSZDA_ver16_dr_0(parameter);
 if (flag_verbose); disp(sprintf(' %% ;')); end;
 
@@ -57,7 +60,7 @@ if (flag_verbose); disp(sprintf(' %% First we copy the parameter structure, ;'))
 if (flag_verbose); disp(sprintf(' %% and specify the new maf_lo_threshold ;')); end;
 if (flag_verbose); disp(sprintf(' %% (which was previously 0.10 by default). ;')); end;
 parameter_maflo = parameter;
-parameter_maflo.maf_lo_threshold = bim_maf_p35; %<-- In a real data-set you might replace bim_maf_p35 with, say, 0.05. ;
+parameter_maflo.maf_lo_threshold = 0.01; %<-- In a real data-set you might replace bim_maf_p35 with, say, 0.05. ;
 for nshuffle=0:parameter_maflo.n_shuffle-1+1;
 parameter_maflo.nshuffle = nshuffle;
 parameter_maflo = xxxcluster_fromdisk_uADZSZDA_ver16(parameter_maflo);
@@ -190,6 +193,7 @@ subplot(p_row,p_col,1+np);np=np+1;
 scatter(AZnV_nix_driver_pd__(1+index_use_,1),AZnV_nix_driver_pd__(1+index_use_,2),16,mr_dvx_(1+index_use_),'filled','MarkerEdgeColor','k');
 axisnotick; title('bicluster-informed (driver)'); xlabel('PC1'); ylabel('PC2');
 end;%if flag_disp;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%;
 end;%if flag_continue;

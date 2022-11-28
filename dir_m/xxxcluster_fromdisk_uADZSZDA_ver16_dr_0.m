@@ -14,11 +14,13 @@ dir_trunk = sprintf('%s/dir_test_xxxcluster_fromdisk_ver16',pwd);
 test_stripped_xxxcluster_fromdisk_ver16(struct('flag_verbose',0));
 parameter = struct('type','parameter');
 parameter.flag_verbose = 1;
-parameter.dir_trunk = dir_trunk;
-parameter.study_name_of_branch_s_ = {'dir_study00'};
-parameter.study_name_without_extension_s_ = {'study00'};
-parameter.mds_name_plus_extension_s_ = {'study00_mds_tsv.txt'};
+parameter.dir_trunk = '/home/jelman/netshare/BETELSHARE/PROJ/AD_Biclustering/data/snp6M';
+parameter.study_name_of_branch_s_ = {''};
+parameter.study_name_without_extension_s_ = {'ukb_imp_allchr_ADCaseControls_6MSNP'};
+parameter.mds_name_plus_extension_s_ = {};
 parameter.ent_cutoff = 0.0045022835561375; %<-- test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16;
+parameter.str_output_prefix = 'test0mds'; 
+parameter.n_shuffle = 0;
 xxxcluster_fromdisk_uADZSZDA_ver16_dr_0(parameter);
 disp(sprintf(' %% Now loading results from test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16. ;'));
 
