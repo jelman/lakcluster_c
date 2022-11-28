@@ -17,7 +17,7 @@ flag_replot = 0;
 if (verbose); disp(sprintf(' %% ;')); end;
 if (verbose); disp(sprintf(' %% Assume path is set using dir_lakcluster_c/dir_m/setup_0.m. ;')); end;
 
-dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_geno_data';
+dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1';
 dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
 if ~exist(dir_jpg,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg)); mkdir(dir_jpg); end;
 
