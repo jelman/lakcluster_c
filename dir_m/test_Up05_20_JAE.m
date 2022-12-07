@@ -187,7 +187,7 @@ if flag_calc;
 %%%%%%%%;
 str_lak_vs_dex = 'dex';
 str_prefix = 'test2mds_maf01';
-str_mr_0in = 'continent1';
+str_mr_0in = 'continent2';
 str_mc_0in = '';
 gamma = 0.05;
 n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
@@ -390,7 +390,7 @@ end;%if ~exist(tmp_fname_xdrop,'file');
 %%%%%%%%;
 % Save out list of snp IDs corresponding to first bicluster
 %%%%%%%%;
-tmp_xdrop_vid_ = dataset_Up05.bim_vid_(xdrop_Up05_.ij_rkeep_);
+tmp_xdrop_vid_ = dataset_Up05.bim_vid_(xdrop_Up05_.index_ckeep_(1:tmp_ckeep));
 xdrop_vid_fname = sprintf('%s/%s_BC0_xdrop_ni%d_vid.txt',parameter_Up05.dir_out_s0000,parameter_Up05.str_prefix,tmp_niteration);
 writecell(tmp_xdrop_vid_, xdrop_vid_fname);
 
@@ -439,21 +439,49 @@ linewidth_big = 3;
 linewidth_sml = 1;
 subplot(1,2,1);
 hold on;
-plot(trace_Up05__.niter_s0000_,ZR_scramble_BC0_,'g-','LineWidth',linewidth_big);
-plot(trace_Up05__.niter_s0000_,trace_Up05__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
 plot(trace_Up05__.niter_s0000_,trace_Up05__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml,'Color', [0 0 0 0.3]);
+plot(trace_Up05__.niter_s0000_,trace_Up05__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
+plot(trace_Up05__.niter_s0000_,ZR_scramble_BC0_,'g-','LineWidth',linewidth_big);
 hold off;
 xlim([0,trace_Up05__.niter_is__(end,1+0)+1]); xlabel('niteration'); ylim([-10,+10]); ylabel('ZR');
 subplot(1,2,2);
 hold on;
-plot(tmp_r_eli_,ZR_scramble_BC0_,'g-','LineWidth',linewidth_big);
-plot(tmp_r_eli_,trace_Up05__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
 plot(tmp_r_eli_,trace_Up05__.ZR_is__(:,2:end),'b-','LineWidth',linewidth_sml,'Color', [0 0 0 0.3]);
+plot(tmp_r_eli_,trace_Up05__.ZR_is__(:,1 + 0),'r-','LineWidth',linewidth_big);
+plot(tmp_r_eli_,ZR_scramble_BC0_,'g-','LineWidth',linewidth_big);
 hold off;
 xlim([min(tmp_r_eli_),max(tmp_r_eli_)]); xlabel('rows eliminated'); ylim([-10,+10]); ylabel('ZR');
 %%%%;
 %%%%%%%%;
 end;%if flag_calc;
+
+
+
+% Pval: exclude bicluster with <5% of case population
+% Zmax: Exclude biclusters with <5% or >95% of case population
+ncases_scramble_BC0 = trace_Up05_scramble_BC0__.r_rem_s0000_(1+0);
+pval_mask_scramble_B0 = trace_Up05_scramble_BC0__.r_rem_s0000_/ncases_scramble_BC0 > .05;
+Z_max_mask_scramble_B0 = (trace_Up05_scramble_BC0__.r_rem_s0000_/ncases_scramble_BC0 > .05) & (trace_Up05_scramble_BC0__.r_rem_s0000_/ncases_scramble_BC0 < .95);
+
+% Calculate p-value for trace
+parameter_Up05_scramble_BC0.flag_verbose = 1; 
+parameter_Up05_scramble_BC0.niteration_alo = 1;
+parameter_Up05_scramble_BC0.niteration_ahi = max(trace_Up05_scramble_BC0__.niter_s0000_(pval_mask_scramble_B0))+1;
+[~,p_all_out_scramble_B0,p_avg_out_scramble_B0,p_top_out_scramble_B0] = p_from_trace__ver0(parameter_Up05_scramble_BC0,trace_Up05_scramble_BC0__);
+
+
+%%%%%%%%;
+% Now run Z_imax_zerobased to pick out an internal iteration of interest. ;
+% This particular function should be within /dir_lakcluster_c/dir_m_dependencies. ;
+%%%%%%%%;
+tmp_Z_scramble_B0_ = trace_Up05_scramble_BC0__.ZR_s0000_(Z_max_mask_scramble_B0); %<-- this is the z-score for the traces of the original data (i.e., nshuffle==0). ;
+tmp_Z_scramble_B0_ = trace_Up05_scramble_BC0__.ZR_is__(Z_max_mask_scramble_B0,1+0); %<-- this is the same as the previous definition. ;
+tmp_Z_min_scramble_B0 = -Inf; %<-- The lowest z-score to consider, putting in -Inf will consider all z-scores. ;
+[tmp_Z_max,tmp_Z_max_index] = Z_imax_zerobased(flag_verbose,tmp_Z_scramble_B0_,tmp_Z_min_scramble_B0);
+%%%%;
+
+
+
 
 flag_calc = 1;
 %%%%%%%%;
@@ -464,7 +492,7 @@ if flag_calc;
 pca_rank = 2;
 p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_);
 %p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_);
-AZnV_DandX_Up05_p01_pnt___ = zeros(dataset_{1+ndataset_Up05}.n_patient,pca_rank,n_p_threshold);
+AZnV_DandX_Up05_p01_pnt___ = zeros(dataset_Up05.n_patient,pca_rank,n_p_threshold);
 %%%%%%%%;
 for np_threshold=0:n_p_threshold-1;
 %%%%%%%%;
@@ -473,7 +501,7 @@ str_p_threshold = sprintf('%.2d',min(99,floor(100*p_threshold)));
 pca_mr_A_Up05_ = { 1*mr_A_ori_Up05_ + 1*mr_Z_ori_Up05_ };
 pca_mr_Z_Up05_ = { 0*mr_A_ori_Up05_ + 0*mr_Z_ori_Up05_ };
 pca_mc_A_Up05 = mc_A_ori_Up05_;
-tmp_mc_ = zeros(dataset_{1+ndataset_Up05}.n_snp,1);
+tmp_mc_ = zeros(dataset_Up05.n_snp,1);
 tmp_mc_(1+efind(Up05_bim_ADp_<=p_threshold))=1;
 pca_mc_A_Up05 = tmp_mc_;
 pca_str_infix_Up05=sprintf('Up05t%s_DandX_p01',str_p_threshold);
