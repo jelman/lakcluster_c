@@ -634,7 +634,7 @@ end;
 %%%%%%%%;
 % Plot UKB and ADNI data together, color by continent;
 %%%%%%%%;
-fname_fig = sprintf('%s/UKB_vs_ADNI_pca',dir_jpg);
+fname_fig = sprintf('%s/UKB_vs_ADNI_pca_continents',dir_jpg);
 if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
 markersize_use = 12;
 np=0;
