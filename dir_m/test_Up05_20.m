@@ -187,7 +187,7 @@ if flag_calc;
 %%%%%%%%;
 str_lak_vs_dex = 'dex';
 str_prefix = 'test2mds_maf01';
-str_mr_0in = 'continent2';
+str_mr_0in = 'continent1';
 str_mc_0in = '';
 gamma = 0.05;
 n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
@@ -391,8 +391,11 @@ end;%if ~exist(tmp_fname_xdrop,'file');
 % Save out list of snp IDs corresponding to first bicluster
 %%%%%%%%;
 tmp_xdrop_vid_ = dataset_Up05.bim_vid_(xdrop_Up05_.index_ckeep_(1:tmp_ckeep));
+tmp_xdrop_al1_ = dataset_Up05.bim_al1_(xdrop_Up05_.index_ckeep_(1:tmp_ckeep));
+tmp_xdrop_al2_ = dataset_Up05.bim_al2_(xdrop_Up05_.index_ckeep_(1:tmp_ckeep));
+tmp_xdrop_alt_ = dataset_Up05.bim_alt_(xdrop_Up05_.index_ckeep_(1:tmp_ckeep));
 xdrop_vid_fname = sprintf('%s/%s_BC0_xdrop_ni%d_vid.txt',parameter_Up05.dir_out_s0000,parameter_Up05.str_prefix,tmp_niteration);
-writecell(tmp_xdrop_vid_, xdrop_vid_fname);
+writecell([tmp_xdrop_vid_ cellstr(tmp_xdrop_al1_)  cellstr(tmp_xdrop_al2_) tmp_xdrop_alt_], xdrop_vid_fname,'Delimiter','\t');
 
 %%%%%%%%;
 % Now we rerun the biclustering once more, instructing the driver to 'scramble' this bicluster. ;
