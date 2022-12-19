@@ -451,8 +451,8 @@ xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
 );
 %%%%;
 mr_dvx_trnUp05_tstAp05_nix_ = 0.0*mr_A_ori_trn_;
-mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_Z_alt_trn_)) = 1; %<-- color case-patients. ;
-mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_A_alt_trn_)) = 2; %<-- color ctrl-patients. ;
+mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_Z_alt_trn_)) = 1; %<-- color ctrl-patients. ;
+mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_A_alt_trn_)) = 2; %<-- color case-patients. ;
 mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_A_rem_trn_)) = 3; %<-- color bicluster-patients (a subset of cases). ;
 if flag_disp;
 figure(1+nf);nf=nf+1;clf;figsml;fig80s;
