@@ -493,20 +493,17 @@ flag_calc = 1;
 if flag_calc;
 
 pca_rank = 2;
-p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_);
+p_threshold_ = 0.05;
 %p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_);
 AZnV_DandX_Up05_p01_pnt___ = zeros(dataset_Up05.n_patient,pca_rank,n_p_threshold);
 %%%%%%%%;
-for np_threshold=0:n_p_threshold-1;
-%%%%%%%%;
-p_threshold = p_threshold_(1+np_threshold);
 str_p_threshold = sprintf('%.2d',min(99,floor(100*p_threshold)));
 pca_mr_A_Up05_ = { 1*mr_A_ori_Up05_ + 1*mr_Z_ori_Up05_ };
 pca_mr_Z_Up05_ = { 0*mr_A_ori_Up05_ + 0*mr_Z_ori_Up05_ };
 pca_mc_A_Up05 = mc_A_ori_Up05_;
-tmp_mc_ = zeros(dataset_Up05.n_snp,1);
-tmp_mc_(1+efind(Up05_bim_ADp_<=p_threshold))=1;
-pca_mc_A_Up05 = tmp_mc_;
+% tmp_mc_ = zeros(dataset_Up05.n_snp,1);
+% tmp_mc_(1+efind(Up05_bim_ADp_<=p_threshold))=1;
+% pca_mc_A_Up05 = tmp_mc_;
 pca_str_infix_Up05=sprintf('Up05t%s_DandX_p01',str_p_threshold);
 parameter_DandX_Up05_p01 = parameter_Up05;
 parameter_DandX_Up05_p01.flag_force_create = 0;
@@ -529,82 +526,42 @@ xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
 ,pca_str_infix_Up05 ...
 );
 tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16: %0.6fs',tmp_t)); end;
-AZnV_DandX_Up05_p01_pnt___(:,:,1+np_threshold) = tmp_AZnV_DandX_Up05_p01_;
-%%%%%%%%;
-end;%for np_threshold=0:n_p_threshold-1;
+AZnV_DandX_Up05_p01_ = tmp_AZnV_DandX_Up05_p01_;
 %%%%%%%%;
 
-nf=0;
-platform = 'rusty';
-if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
-if (strcmp(platform,'access1')); str_home = 'data'; end;
-if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
-if (strcmp(platform,'eval1')); str_home = 'home'; end;
-if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
 dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
 mr_Up05_p01_continent_ = textread(sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
 
-fname_fig_pre = sprintf('%s/pca_proj_D_Up05txx_DandX_p01_k22_B44_AZnV_',dir_jpg); %<-- fname_fig_pre for coarse resolution of p-value-threshold. ;
-%fname_fig_pre = sprintf('%s/pca_proj_D_Up05t6x_DandX_p01_k22_B44_AZnV_',dir_jpg); %<-- fname_fig_pre for finer resolution. ;
-fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
-fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
 %%%%%%%%;
 dir_pca_tmp = sprintf('%s/dir_Up05/dir_test2mds_maf01_analyze/dir_test2mds_maf01_dex_p01_D_m2r1_g050/dir_pca/dir_pca_mda',dir_trunk);
-p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_); %<-- coarse resolution of p-value-threshold. ;
 %p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_); %<-- finer resolution. ;
 figure(1+nf);nf=nf+1;clf;figbig;fig80s;
-markersize_use = 8;
-p_row = 4; p_col = ceil(n_p_threshold/p_row); np=0;
-for np_threshold=0:n_p_threshold-1;
+markersize_use = 16;
 p_threshold = p_threshold_(1+np_threshold);
 str_p_threshold = sprintf('%.2d',min(99,floor(100*p_threshold)));
-subplot(p_row,p_col,1+np);np=np+1;
-tmp_fname_AnV_txx = sprintf('%s/pca_proj_D_Up05t%s_DandX_p01_k2_B44_AnV_.mda',dir_pca_tmp,str_p_threshold);
-tmp_fname_ZnV_txx = sprintf('%s/pca_proj_D_Up05t%s_DandX_p01_k2_B44_ZnV_.mda',dir_pca_tmp,str_p_threshold);
+tmp_fname_AnV_txx = sprintf('%s/pca_proj_D_Up05_DandX_p01_k2_B44_AnV_.mda',dir_pca_tmp);
+tmp_fname_ZnV_txx = sprintf('%s/pca_proj_D_Up05_DandX_p01_k2_B44_ZnV_.mda',dir_pca_tmp);
 if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
 tmp_AnV_txx__ = mda_read_r8(tmp_fname_AnV_txx);
 tmp_ZnV_txx__ = mda_read_r8(tmp_fname_ZnV_txx);
 tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
-scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled');
-end;%if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
-xlabel('pc0');ylabel('pc1');title(sprintf('p<=%+0.4f',p_threshold));
-end;%for np_threshold=0:n_p_threshold-1;
-%%%%%%%%;
-sgtitle(fname_fig_pre,'Interpreter','none');
-print('-djpeg',fname_fig_jpg);
-print('-depsc',fname_fig_eps);
-close gcf;
-%%%%%%%%;
-
-%{
-mx__ = load_mx__from_parameter_ver0(parameter_DandX_Up05_p01);
-mr_dvx_ = 0.0*mx__.mr_A_full_;
-mr_dvx_(1+efind(mx__.mr_A_full_))=2;
-mr_dvx_(1+efind(mx__.mr_Z_full_))=1;
 if flag_disp;
-figure(1+nf);nf=nf+1;clf;figmed;fig80s;
 %%%%;
-subplot(1,2,1);
+ax1 = subplot(1,2,1);
 %scatter3(AZnV_DandX_Up05_p01_(:,1),AZnV_DandX_Up05_p01_(:,2),AZnV_DandX_Up05_p01_(:,3),8,mr_dvx_,'filled');
-scatter(AZnV_DandX_Up05_p01_(:,1),AZnV_DandX_Up05_p01_(:,2),8,mr_dvx_,'filled');
+scatter(tmp_AZnV_txx__(:,1),tmp_AZnV_txx__(:,2),8,mr_dvx_,'filled','MarkerEdgeColor','k','Linewidth', 0.1);
 xlabel('pc0'); ylabel('pc1'); title('case magenta, ctrl cyan');
-axis equal; axis vis3d;
 %%%%;
-subplot(1,2,2);
-scatter(AZnV_DandX_Up05_p01_(:,1),AZnV_DandX_Up05_p01_(:,2),8,mr_Up05_p01_continent_,'filled');
+ax2 = subplot(1,2,2);
+scatter(tmp_AZnV_txx__(:,1),tmp_AZnV_txx__(:,2),8,mr_Up05_p01_continent_,'filled','MarkerEdgeColor','k','Linewidth', 0.1);
 xlabel('pc0'); ylabel('pc1'); title('continent 0,1,2');
-axis equal; axis vis3d;
+cmap = brewermap(3, 'Set1');
+colormap(ax2, cmap);
 %%%%;
-fname_fig = sprintf('/%s/rangan/dir_bcc/dir_jelman/dir_Up05/Up05_DandX_p01_FIGA',str_home);
+fname_fig = sprintf('/%s/dir_Up05/Up05_DandX_p01_FIGA',dir_trunk);
 print('-djpeg',sprintf('%s.jpg',fname_fig));
 print('-depsc',sprintf('%s.eps',fname_fig));
+end;
 end;%if flag_disp;
 %%%%%%%%;
- %}
-
-
-end;%if flag_calc;
-
-
 
