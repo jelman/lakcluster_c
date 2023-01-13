@@ -187,7 +187,7 @@ if flag_calc;
 %%%%%%%%;
 str_lak_vs_dex = 'dex';
 str_prefix = 'test2mds_maf01';
-str_mr_0in = 'continent1';
+str_mr_0in = 'continent3';
 str_mc_0in = '';
 gamma = 0.05;
 n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];

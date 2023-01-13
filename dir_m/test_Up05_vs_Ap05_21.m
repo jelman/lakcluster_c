@@ -618,11 +618,11 @@ if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'AZnV_D_Ap05_from_Up
 %%%%%%%%;
 fname_fig = sprintf('%s/UKB_vs_ADNI_pca',dir_jpg);
 if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
-markersize_use = 12;
+markersize_use = 16;
 np=0;
 hold on;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#0072B2','MarkerEdgeColor','k','MarkerFaceAlpha',.7,'MarkerEdgeAlpha',.7);
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#E69F00','MarkerEdgeColor','k','MarkerFaceAlpha',.7,'MarkerEdgeAlpha',.7);
+scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#0072B2','MarkerEdgeColor','k');
+scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#E69F00','MarkerEdgeColor','k');
 legend('UKB','ADNI','Location','Best');
 axisnotick; title('UKB vs ADNI'); xlabel('PC1'); ylabel('PC2');
 hold off
@@ -636,15 +636,16 @@ end;
 %%%%%%%%;
 fname_fig = sprintf('%s/UKB_vs_ADNI_pca_continents',dir_jpg);
 if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
-markersize_use = 12;
+markersize_use = 16;
 np=0;
-cmap = brewermap(3,'Set1');
+cmap = {'#D55E00', '#009E73', '#0072B2'};
+cmap = validatecolor(cmap, 'multiple');
 colormap(cmap);
 hold on;
 scatter(nan, nan, 's','MarkerEdgeColor','k','DisplayName','UKB');
 scatter(nan, nan, 'o','MarkerEdgeColor','k','DisplayName','ADNI');
 scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'s');
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Ap05_from_Up05_cap_Ap05_p01_continent_,'o','filled','MarkerEdgeColor','k','MarkerFaceAlpha',.7,'MarkerEdgeAlpha',.7);
+scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Ap05_from_Up05_cap_Ap05_p01_continent_,'o','filled','MarkerEdgeColor','k');
 legend('UKB','ADNI','Location','Best');
 axisnotick; title('UKB vs ADNI'); xlabel('PC1'); ylabel('PC2');
 hold off

@@ -177,7 +177,7 @@ xxxcluster_fromdisk_uADZSZDA_pca_D_from_ni_ver16( ...
 if flag_disp;
 subplot(p_row,p_col,1+np);np=np+1;
 scatter(AZnV_ni0_driver_pd__(1+index_use_,1),AZnV_ni0_driver_pd__(1+index_use_,2),16,mr_dvx_(1+index_use_),'filled','MarkerEdgeColor','k');
-axisnotick; title('full data-set (driver)'); xlabel('PC1'); ylabel('PC2');
+axisnotick; title('Full dataset'); xlabel('PC1'); ylabel('PC2');
 end;%if flag_disp;
 %%%%%%%%;
 ni=ij_nlpR-1;
@@ -194,7 +194,7 @@ xxxcluster_fromdisk_uADZSZDA_pca_D_from_ni_ver16( ...
 if flag_disp;
 subplot(p_row,p_col,1+np);np=np+1;
 scatter(AZnV_nix_driver_pd__(1+index_use_,1),AZnV_nix_driver_pd__(1+index_use_,2),16,mr_dvx_(1+index_use_),'filled','MarkerEdgeColor','k');
-axisnotick; title('bicluster-informed (driver)'); xlabel('PC1'); ylabel('PC2');
+axisnotick; title('Bicluster'); xlabel('PC1'); ylabel('PC2');
 end;%if flag_disp;
 
 
