@@ -3,3 +3,8 @@ lakcluster_ver18
 *.o
 *.b16
 *~
+dir_test_xxxcluster_fromdisk_ver16/
+dir_m/dir_test_subcontinents_xxxcluster_fromdisk_ver16/
+dir_m/dir_test_xxxcluster_fromdisk_ver16/
+lakcluster_ver18_jelman.make
+pathdef.m
