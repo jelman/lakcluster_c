@@ -283,7 +283,7 @@ end;%for ncontinent=0:n_continent-1;
 % These will be used below to define row- and col-masks for the pca. ;
 %%%%%%%%;
 dir_trunk_Up05 = sprintf('%s/dir_Up05',dir_trunk);
-ncontinent = 1; %<-- Assumes continents labels are 1-based. If not, see notes when defining mr_A_alt_trn_ and mr_Z_alt_trn_ below;
+ncontinent = 2; %<-- Assumes continents labels are 1-based. If not, see notes when defining mr_A_alt_trn_ and mr_Z_alt_trn_ below;
 if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% maf_lo_threshold %0.2f; ncontinent %d/%d;',maf_lo_threshold,ncontinent,n_continent)); end;
 if (flag_verbose); disp(sprintf(' %% ;')); end;
@@ -538,7 +538,7 @@ end;%if (flag_replot | ~exist(fname_fig_jpg,'file'));
 % Note that the secondary bicluster is not very significant. ;
 %%%%%%%%;
 dir_trunk_Up05 = sprintf('%s/dir_Up05',dir_trunk);
-ncontinent = 1; %<-- Assumes continents labels are 1-based. If not, see notes when defining mr_A_alt_trn_ and mr_Z_alt_trn_ below;
+ncontinent = 2; %<-- Assumes continents labels are 1-based. If not, see notes when defining mr_A_alt_trn_ and mr_Z_alt_trn_ below;
 if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% maf_lo_threshold %0.2f; ncontinent %d/%d;',maf_lo_threshold,ncontinent,n_continent)); end;
 if (flag_verbose); disp(sprintf(' %% ;')); end;
@@ -968,7 +968,7 @@ hold off;
 xlim(xlim_);
 
 %%%%%%%%;
-% Now, for the training dataset Ap05, ;
+% Now, for the testing dataset Ap05, ;
 % We define the 'projected value' of each patient as the ;
 % position of that patient after projection onto the ;
 % dominant pc of the first bicluster ;
@@ -1005,8 +1005,8 @@ if flag_disp;
 % for each of the thresholds used above.
 % This is after we project onto the dominant pc of the bicluster, ;
 % defined using only the shared allele-combinations. ;
-% For this plot the training-data is shown in red, ;
-% while the testing-data is shown in green. ;
+% For this plot the training-data (Up05) is shown in red, ;
+% while the testing-data (Ap05) is shown in green. ;
 % Note that there is a large range of thresholds for which ;
 % the testing-data is very significant. ;
 % (significance value of 0.05 is marked with dashed line). ;
@@ -1029,245 +1029,33 @@ xlabel('pc1 threshold');
 ylabel('-log(p(AUC))','Interpreter','none');
 legend({'train','test'},'Location','NorthWest');
 title('AZnV_D_trnUp05_tstAp05_nix_p01_','Interpreter','none');
+fname_fig_pre = sprintf('%s/test_Up05_vs_Ap05_18b_FIGA',dir_jpg); %<-- note that this matches the previous test_Up05_vs_Ap05_18b.m ;
+fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
+fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
+if flag_replot | ~exist(fname_fig_jpg,'file');
+disp(sprintf(' %% %s not found, creating',fname_fig_jpg));
+print('-djpeg',fname_fig_jpg);
+print('-depsc',fname_fig_eps);
+end;%if flag_replot | ~exist(fname_fig_jpg,'file');
 end;%if flag_disp;
 
-%%%%%%%%;
-% Now try and find a mapping from Ap05 to Up05. ;
-% For Ap05 we will use the projected values: ;
-% AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_. ;
-% For Up05 we will use the projected values: ;
-% AZnV_D_trnUp05_tstAp05_nix_p01_. ;
-%%%%%%%%;
-mr_dvx_trnUp05_tstAp05_nix_ = 0.0*mr_A_ori_trn_; %<-- initialize labels. ;
-mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_Z_alt_trn_)) = 1; %<-- color ctrl-patients. ;
-mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_A_alt_trn_)) = 2; %<-- color case-patients. ;
-mr_dvx_trnUp05_tstAp05_nix_(1+efind(mr_A_rem_trn_)) = 3; %<-- color bicluster-patients (a subset of cases). ;
-tmp_index_Up05_ = efind( (mr_dvx_trnUp05_tstAp05_nix_==1) | (mr_dvx_trnUp05_tstAp05_nix_==2) | (mr_dvx_trnUp05_tstAp05_nix_==3) );
-Y_dy__ = transpose(AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_Up05_,:));
-mr_dvx_Ap05_from_trnUp05_tstAp05_nix_ = 0.0*mr_A_ori_tst_; %<-- initialize labels. ;
-mr_dvx_Ap05_from_trnUp05_tstAp05_nix_(1+efind(mr_Z_alt_tst_)) = 1; %<-- color ctrl-patients. ;
-mr_dvx_Ap05_from_trnUp05_tstAp05_nix_(1+efind(mr_A_alt_tst_)) = 2; %<-- color case-patients. ;
-tmp_index_Ap05_ = efind( (mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1) | (mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2) );
-X_dx__ = transpose(AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_Ap05_,:));
-%%%%%%%%;
-% Now we construct the transformation a_est_ and A_est__, ;
-% such that a_est_ + A_est__*X_dx__ is approximately Y_dy__. ;
-% The value of k_use will be iteratively shrunk to 1 (i.e., the smallest possible). ;
-% As long as the initial k_use is sufficiently large, the result should be relatively stable. ;
-%%%%%%%%;
-parameter_apm = struct('type','parameter_apm');
-parameter_apm.k_use = 32; %<-- This is the initial number of nearest neighbors to use. ;
-parameter_apm.flag_disp = 1;
-[parameter_apm,a_est_,A_est__,tmp_X_dx__] = ...
-affine_point_match_0(parameter_apm,X_dx__,Y_dy__);
-
-%%%%%%%%;
-% Now we can plot the results. ;
-%%%%%%%%;
-figure(1+nf);nf=nf+1;clf;figbig;
-markersize_big = 12;
-markersize_sml = 8;
-fontsize_use = 12;
-subplot(1,1,1);
-hold on;
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==1);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[0.0,1.0,1.0]);
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==2);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[0.5,0.0,0.5]);
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==3);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[1.0,0.0,1.0]);
-tmp_index_ = efind(mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1);
-X_xd__ = AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
-plot(tmp_X_xd__(:,1+0),tmp_X_xd__(:,1+1),'k^','MarkerSize',markersize_sml,'MarkerFaceColor',[0.0,0.8,0.8]);
-tmp_index_ = efind(mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2);
-X_xd__ = AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
-plot(tmp_X_xd__(:,1+0),tmp_X_xd__(:,1+1),'k^','MarkerSize',markersize_sml,'MarkerFaceColor',[0.8,0.0,0.8]);
-legend({'Up05 ctrl','Up05 case','Up05 bicl','Ap05 ctrl','Ap05 case'});
-set(gca,'Fontsize',fontsize_use);
-fname_fig_pre = sprintf('%s/AZnV_D_Up05_vs_Ap05_apm_FIGB',dir_jpg);
-fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
-fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
-if flag_replot | ~exist(fname_fig_jpg,'file');
-disp(sprintf(' %% %s not found, creating',fname_fig_jpg));
-print('-djpeg',fname_fig_jpg);
-print('-depsc',fname_fig_eps);
-end;%if flag_replot | ~exist(fname_fig_jpg,'file');
-
-%%%%%%%%;
-% Now estimate p-value. ;
-%%%%%%%%;
-Up05_stack_yd__ = zeros(0,2);
-Up05_stack_m_ = zeros(0,1);
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==1);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-Up05_stack_yd__ = [Up05_stack_yd__;Y_yd__];
-Up05_stack_m_ = [Up05_stack_m_;1*ones(size(Y_yd__,1),1)]; %<-- ctrl label. ;
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==2);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-Up05_stack_yd__ = [Up05_stack_yd__;Y_yd__];
-Up05_stack_m_ = [Up05_stack_m_;2*ones(size(Y_yd__,1),1)]; %<-- case label. ;
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==3);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-Up05_stack_yd__ = [Up05_stack_yd__;Y_yd__];
-Up05_stack_m_ = [Up05_stack_m_;2*ones(size(Y_yd__,1),1)]; %<-- case label, and not bicl label just yet. ;
-Ap05_stack_xd__ = zeros(0,2);
-Ap05_stack_m_ = zeros(0,1);
-tmp_index_ = efind(mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1);
-X_xd__ = AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
-Ap05_stack_xd__ = [Ap05_stack_xd__;tmp_X_xd__];
-Ap05_stack_m_ = [Ap05_stack_m_;1*ones(size(tmp_X_xd__,1),1)]; %<-- ctrl label. ;
-tmp_index_ = efind(mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2);
-X_xd__ = AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
-Ap05_stack_xd__ = [Ap05_stack_xd__;tmp_X_xd__];
-Ap05_stack_m_ = [Ap05_stack_m_;2*ones(size(tmp_X_xd__,1),1)]; %<-- case label. ;
-%%%%%%%%;
-[ ...
- ~ ...
-,z_z_ ...
-,z_zp__ ...
-,z_x_ ...
-,z_xp__ ...
-,z_y_ ...
-,z_yp__ ...
-,f_z_ ...
-,f_zp__ ...
-,f_x_ ...
-,f_xp__ ...
-,f_y_ ...
-,f_yp__ ...
-] = ...
-affine_point_match_p_0( ...
- [] ...
-,transpose(Ap05_stack_xd__) ...
-,Ap05_stack_m_ ...
-,transpose(Up05_stack_yd__) ...
-,Up05_stack_m_ ...
-);
-
-%%%%%%%%;
-% Now look only at the bicluster patients from Up05, ;
-% and check to see if they are near to the cases from Ap05. ;
-%%%%%%%%;
-Up05_biclu_yd__ = zeros(0,2);
-Up05_biclu_m_ = zeros(0,1);
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==1);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-Up05_biclu_yd__ = [Up05_biclu_yd__;Y_yd__];
-Up05_biclu_m_ = [Up05_biclu_m_;1*ones(size(Y_yd__,1),1)]; %<-- ctrl label. ;
-%tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==2);
-%Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-%Up05_biclu_yd__ = [Up05_biclu_yd__;Y_yd__];
-%Up05_biclu_m_ = [Up05_biclu_m_;2*ones(size(Y_yd__,1),1)]; %<-- case label. ;
-tmp_index_ = efind(mr_dvx_trnUp05_tstAp05_nix_==3);
-Y_yd__ = AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
-Up05_biclu_yd__ = [Up05_biclu_yd__;Y_yd__];
-Up05_biclu_m_ = [Up05_biclu_m_;2*ones(size(Y_yd__,1),1)]; %<-- case label. ;
-[ ...
- ~ ...
-,~ ...
-,~ ...
-,z_biclu_x_ ...
-,z_biclu_xp__ ...
-,~ ...
-,~ ...
-,~ ...
-,~ ...
-,f_biclu_x_ ...
-,f_biclu_xp__ ...
-,~ ...
-,~ ...
-] = ...
-affine_point_match_p_0( ...
- [] ...
-,transpose(Ap05_stack_xd__) ...
-,Ap05_stack_m_ ...
-,transpose(Up05_biclu_yd__) ...
-,Up05_biclu_m_ ...
-);
-
-n_y = size(Up05_stack_yd__,1); n_x = size(Ap05_stack_xd__,1); n_z = max(n_x,n_y);
-tmp_x_ = linspace(0,1,n_x); tmp_y_ = linspace(0,1,n_y); tmp_z_ = linspace(0,1,n_z);
-%%%%%%%%;
-figure(1+nf);nf=nf+1;clf;figbig; p_row = 2; p_col = 4;
-linewidth_sml = 0.5; linewidth_big = 2.0; ylim_ = 10*[-1,+1];
-%%%%;
-for ntab=0:p_col-1;
-if ntab==0; tmp_w_ = tmp_z_; f_w_ = f_z_; f_wp__ = f_zp__; z_w_ = z_z_; z_wp__ = z_zp__; str_f_w = 'f_z_'; str_z_w = 'z_z_'; end;
-if ntab==1; tmp_w_ = tmp_x_; f_w_ = f_x_; f_wp__ = f_xp__; z_w_ = z_x_; z_wp__ = z_xp__; str_f_w = 'f_x_'; str_z_w = 'z_x_'; end;
-if ntab==2; tmp_w_ = tmp_y_; f_w_ = f_y_; f_wp__ = f_yp__; z_w_ = z_y_; z_wp__ = z_yp__; str_f_w = 'f_y_'; str_z_w = 'z_y_'; end;
-if ntab==3; tmp_w_ = tmp_x_; f_w_ = f_biclu_x_; f_wp__ = f_biclu_xp__; z_w_ = z_biclu_x_; z_wp__ = z_biclu_xp__; str_f_w = 'f_biclu_x_'; str_z_w = 'z_biclu_x_'; end;
-subplot(p_row,p_col,1+ntab+0*p_col);
-hold on;
-plot(tmp_w_,f_wp__,'k','LineWidth',linewidth_sml);
-plot(tmp_w_,f_w_,'r','LineWidth',linewidth_big);
-hold off;
-title(str_f_w,'Interpreter','none');
-xlim([0,1]); xlabel('fraction nearest');
-ylabel('f fraction');
-set(gca,'XTick',0:0.05:1.0); grid on;
-subplot(p_row,p_col,1+ntab+1*p_col);
-hold on;
-plot(tmp_w_,max(min(ylim_),min(max(ylim_),z_wp__)),'k','LineWidth',linewidth_sml);
-plot(tmp_w_,max(min(ylim_),min(max(ylim_),z_w_)),'r','LineWidth',linewidth_big);
-hold off;
-title(str_z_w,'Interpreter','none');
-xlim([0,1]); xlabel('fraction nearest');
-ylim(ylim_); ylabel('z score');
-set(gca,'XTick',0:0.05:1.0); grid on;
-end;%for ntab=0:p_col-1;
-%%%%;
-fname_fig_pre = sprintf('%s/AZnV_D_Up05_vs_Ap05_apm_FIGC',dir_jpg);
-fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
-fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
-if flag_replot | ~exist(fname_fig_jpg,'file');
-disp(sprintf(' %% %s not found, creating',fname_fig_jpg));
-print('-djpeg',fname_fig_jpg);
-print('-depsc',fname_fig_eps);
-end;%if flag_replot | ~exist(fname_fig_jpg,'file');
-
-%%%%%%%%;
-% Now replot, using empirical p-value. ;
-%%%%%%%%;
-n_y = size(Up05_stack_yd__,1); n_x = size(Ap05_stack_xd__,1); n_z = max(n_x,n_y);
-tmp_x_ = linspace(0,1,n_x); tmp_y_ = linspace(0,1,n_y); tmp_z_ = linspace(0,1,n_z);
-%%%%%%%%;
-figure(1+nf);nf=nf+1;clf;figbig; p_row = 1; p_col = 4;
-linewidth_sml = 0.5; linewidth_big = 2.0; ylim_ = 10*[-1,+1];
-%%%%;
-for ntab=0:p_col-1;
-if ntab==0; tmp_w_ = tmp_z_; f_w_ = f_z_; f_wp__ = f_zp__; str_p_w = 'p_z_'; end;
-if ntab==1; tmp_w_ = tmp_x_; f_w_ = f_x_; f_wp__ = f_xp__; str_p_w = 'p_x_'; end;
-if ntab==2; tmp_w_ = tmp_y_; f_w_ = f_y_; f_wp__ = f_yp__; str_p_w = 'p_y_'; end;
-if ntab==3; tmp_w_ = tmp_x_; f_w_ = f_biclu_x_; f_wp__ = f_biclu_xp__; str_p_w = 'p_biclu_x_'; end;
-f_wp0__ = [f_w_ , f_wp__];
-[~,tmp_ij_wp__] = sort(f_wp0__,2,'ascend');
-[~,tmp_p_wp__] = sort(tmp_ij_wp__,2,'ascend');
-tmp_p_wp__ = tmp_p_wp__/size(tmp_p_wp__,2);
-subplot(p_row,p_col,1+ntab);
-hold on;
-%plot(tmp_w_,tmp_p_wp__(:,2:end),'k','LineWidth',linewidth_sml);
-plot(tmp_w_,tmp_p_wp__(:,1    ),'r','LineWidth',linewidth_big);
-hold off;
-title(str_p_w,'Interpreter','none');
-xlim([0,1]); xlabel('fraction nearest');
-ylim([0,1]); ylabel('p empirical');
-set(gca,'XTick',0:0.05:1.0); grid on;
-set(gca,'YTick',0:0.05:1.0); grid on;
-set(gca,'TickLength',[0,0]);
-end;%for ntab=0:p_col-1;
-%%%%;
-fname_fig_pre = sprintf('%s/AZnV_D_Up05_vs_Ap05_apm_FIGD',dir_jpg);
-fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
-fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
-if flag_replot | ~exist(fname_fig_jpg,'file');
-disp(sprintf(' %% %s not found, creating',fname_fig_jpg));
-print('-djpeg',fname_fig_jpg);
-print('-depsc',fname_fig_eps);
-end;%if flag_replot | ~exist(fname_fig_jpg,'file');
+dir_mat_replication = sprintf('%s/dir_mat_replication',dir_trunk);
+if ~exist(dir_mat_replication,'dir'); disp(sprintf(' %% mkdir %s',dir_mat_replication')); mkdir(dir_mat_replication); end;
+fname_mat = sprintf('%s/trnUp05_tst_Ap05_ncontinent%d.mat',dir_mat_replication,ncontinent);
+if ~exist(fname_mat,'file');
+disp(sprintf(' %% %s not found, creating',fname_mat));
+save(fname_mat ...
+     ,'AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_' ...
+     ,'AZnV_D_trnUp05_tstAp05_nix_p01_' ...
+     ,'mr_A_alt_trn_' ...
+     ,'mr_A_alt_tst_' ...
+     ,'mr_A_rem_trn_' ...
+     ,'mr_Z_alt_trn_' ...
+     ,'mr_Z_alt_tst_' ...
+     ,'mr_dvx_Ap05_from_trnUp05_tstAp05_nix_' ...
+     ,'mr_dvx_trnUp05_tstAp05_nix_' ...
+     );
+end;%if ~exist(fname_mat,'file');
+if  exist(fname_mat,'file');
+disp(sprintf(' %% %s found, not creating',fname_mat));
+end;%if  exist(fname_mat,'file');
