@@ -1,12 +1,12 @@
 clear;
-platform = 'rusty';
-if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
-if (strcmp(platform,'access1')); str_home = 'data'; end;
-if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
-if (strcmp(platform,'eval1')); str_home = 'home'; end;
-if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
+% platform = 'rusty';
+% if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
+% if (strcmp(platform,'access1')); str_home = 'data'; end;
+% if (strcmp(platform,'OptiPlex')); str_home = 'home'; end;
+% if (strcmp(platform,'eval1')); str_home = 'home'; end;
+% if (strcmp(platform,'rusty')); str_home = 'mnt/home'; end;
 %%%%%%%%;
-run(sprintf('/%s/rangan/dir_bcc/dir_lakcluster_c_dev/dir_m/setup_0',str_home));
+run('/home/jelman/Github/lakcluster_c/dir_m/setup_0'); %<-- set up the paths. ;
 flag_verbose = 1;
 flag_disp = 1+flag_verbose; nf=0;
 flag_replot = 0;
@@ -15,8 +15,8 @@ if (flag_verbose); disp(sprintf(' %% Assume path is set using dir_lakcluster_c/d
 
 if (flag_verbose); disp(sprintf(' %% Comparing Up05 with Ap05 data. ;')); end;
 
-dir_code = sprintf('/%s/rangan/dir_bcc/dir_lakcluster_c_dev',str_home);
-dir_trunk = sprintf('/%s/rangan/dir_bcc/dir_jelman',str_home);
+dir_code = '/home/jelman/Github/lakcluster_c';
+dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/ADNI/ADNI_vs_UKB';
 dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
 if ~exist(dir_jpg,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg)); mkdir(dir_jpg); end;
 
@@ -32,7 +32,9 @@ if ~exist(dir_jpg_replication,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg_replic
 %%%%%%%%;
 % Now load one of the data-files containing the projected values and labels. ;
 %%%%%%%%;
-str_datafile = sprintf('trnUp05_tst_Ap05_ncontinent0'); k_gamma_use = 0.50; %<-- this is quite robust for this dataset, with similar results from [0.05,0.50]. ;
+ncontinent = 1; 
+str_datafile = sprintf('trnUp05_tst_Ap05_ncontinent%d',ncontinent); 
+k_gamma_use = 0.50; %<-- Continent1 converges at .50, continent2 must be lowered to 0.15 ;
 %%%%%%%%;
 % Alternatively, we can load the data from jeremey sent on 20230114. ;
 %%%%%%%%;
