@@ -58,7 +58,7 @@ if ~isfield(parameter,'box_expand'); parameter.box_expand = 1.25; end;
 box_expand = parameter.box_expand;
 if ~isfield(parameter,'c_use__'); parameter.c_use__ = colormap_pm; end;
 c_use__ = parameter.c_use__;
-if ~isfield(parameter,'legend_use_'); parameter.legend_use_ = {'ctrl','case','bicl'}; end;
+if ~isfield(parameter,'legend_use_'); parameter.legend_use_ = {'Control','Case','Bicluster-case'}; end;
 legend_use_ = parameter.legend_use_;
 if ~isfield(parameter,'legend_location'); parameter.legend_location = 'NorthWest'; end;
 legend_location = parameter.legend_location;
@@ -115,7 +115,7 @@ xlim(AZnV_0_lim_); ylim(AZnV_1_lim_); grid on; set(gca,'TickLength',[0,0]);
 set(gca,'XTick',AZnV_0_tick_(1:n_tick_0:end),'XTickLabel',num2str(transpose(AZnV_0_tick_(1:n_tick_0:end)),'%+.1f'));
 set(gca,'YTick',AZnV_1_tick_(1:n_tick_1:end),'YTickLabel',num2str(transpose(AZnV_1_tick_(1:n_tick_1:end)),'%+.1f'));
 xtickangle(90); set(gca,'FontSize',fontsize_use);
-title('scatter','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+% title('scatter','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%%%%%;
 
 %%%%%%%%;
@@ -125,7 +125,7 @@ set(gca,'ydir','normal'); set(gca,'TickLength',[0,0]);
 set(gca,'XTick',1:n_tick_0:n_h_0,'XTickLabel',num2str(transpose(AZnV_0_tick_(1:n_tick_0:end)),'%+.1f'));
 set(gca,'YTick',1:n_tick_0:n_h_1,'YTickLabel',num2str(transpose(AZnV_1_tick_(1:n_tick_1:end)),'%+.1f'));
 xtickangle(90); set(gca,'FontSize',fontsize_use);
-title('heatmap','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+% title('heatmap','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%%%%%;
 
 %%%%%%%%;
