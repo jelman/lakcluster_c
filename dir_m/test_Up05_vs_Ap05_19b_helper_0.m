@@ -58,6 +58,11 @@ parameter_apm.k_gamma = 0.05; %<-- robust from 0.50 to 0.05 ;
 parameter_apm.flag_disp = 0;
 [parameter_apm,a_est_,A_est__,tmp_X_dx__] = ...
 affine_point_match_1(parameter_apm,X_dx__,Y_dy__,[],[],label_X_x_,label_Y_y_);
+% Get labels for controls, cases, and bicluster-cases
+mr_dvx_trnUp05_tstAp05_nix_ = 0.0*label_Y_y_;
+mr_dvx_trnUp05_tstAp05_nix_(1+efind(tmp_.mr_Z_alt_trn_(1+tmp_index_Up05_))) = 1; %<-- color ctrl-patients. ;
+mr_dvx_trnUp05_tstAp05_nix_(1+efind(tmp_.mr_A_alt_trn_(1+tmp_index_Up05_))) = 2; %<-- color case-patients. ;
+mr_dvx_trnUp05_tstAp05_nix_(1+efind(tmp_.mr_A_rem_trn_(1+tmp_index_Up05_))) = 3; %<-- color bicluster-patients (a subset of cases). ;
 %%%%;
 % get limits from trnUp05. ;
 %%%%;
@@ -65,11 +70,11 @@ figure(1+nf);nf=nf+1;clf;set(gcf,'Position',1+[0,0,1024*2,768]);
 [~,AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_] = ...
 test_scatter_and_heatmap_0( ...
  [] ...
-, label_Y_y_ ...
+, mr_dvx_trnUp05_tstAp05_nix_ ...
 , transpose(Y_dy__) ...
 );
 fname_fig_pre = sprintf('%s/%s_Up05_FIGA',dir_jpg_replication,str_datafile);
-sgtitle(fname_fig_pre,'Interpreter','none');
+% sgtitle(fname_fig_pre,'Interpreter','none');
 fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
 fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
 if flag_replot | ~exist(fname_fig_jpg,'file');
@@ -92,7 +97,7 @@ test_scatter_and_heatmap_0( ...
 );
 %%%%;
 fname_fig_pre = sprintf('%s/%s_apm_Ap05_FIGA',dir_jpg_replication,str_datafile);
-sgtitle(fname_fig_pre,'Interpreter','none');
+% sgtitle(fname_fig_pre,'Interpreter','none');
 fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
 fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
 if flag_replot | ~exist(fname_fig_jpg,'file');
