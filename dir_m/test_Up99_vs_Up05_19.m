@@ -518,6 +518,100 @@ print('-depsc',fname_fig_eps);
 close gcf;
 %%%%%%%%;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Run PCA on random SNPs subset of the same size as p<0.05  
+% Plot results colored by continent to determine whether    
+% structure resembles p<0.05 or p<1.0
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+str_randp_threshold = 'random_p05';
+pca_mr_A_Up99_ = { 1*mr_A_ori_Up99_ + 1*mr_Z_ori_Up99_ };
+pca_mr_Z_Up99_ = { 0*mr_A_ori_Up99_ + 0*mr_Z_ori_Up99_ };
+pca_mc_A_Up99 = mc_A_ori_Up99_;
+tmp_mc_ = zeros(dataset_{1+ndataset_Up99}.n_snp,1);
+n_snp_p05 = sum(Up99_bim_ADp_<=p_threshold);
+idx_randp = randsample(length(tmp_mc_),n_snp_p05);
+tmp_mc_(sort(idx_randp))=1;
+pca_mc_A_Up99 = tmp_mc_;
+pca_str_infix_Up99=sprintf('Up99t%s_DandX_p01',str_randp_threshold);
+parameter_DandX_Up99_p01 = parameter_Up99;
+parameter_DandX_Up99_p01.flag_force_create = 0;
+parameter_DandX_Up99_p01.str_A_p = str_Up99_A_p_p01;
+parameter_DandX_Up99_p01.str_name_s0000 = sprintf('pca_Up99t%s_DandX_p01',str_randp_threshold);
+parameter_DandX_Up99_p01.slurm_memdecl = memory_GB;
+tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16 ...')); end;
+[ ...
+parameter_DandX_Up99_p01 ...
+,randp_AZnV_DandX_Up99_p01_ ...
+,randp_AnV_DandX_Up99_p01_ ...
+,randp_ZnV_DandX_Up99_p01_ ...
+,randp_V_DandX_Up99_p01_ ...
+] = ...
+xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
+parameter_DandX_Up99_p01 ...
+,pca_rank ...
+,pca_mr_A_Up99_ ...
+,pca_mr_Z_Up99_ ...
+,pca_mc_A_Up99 ...
+,pca_str_infix_Up99 ...
+);
+tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16: %0.6fs',tmp_t)); end;
+
+% Plot results of random subset of SNPs
+dir_pca_tmp = sprintf('%s/dir_Up99/dir_test2mds_maf01_analyze/dir_test2mds_maf01_dex_p01_D_m2r1_g050/dir_pca/dir_pca_mda',dir_trunk);
+markersize_use = 12;
+cmap = {'#D55E00', '#009E73', '#0072B2'};
+cmap = validatecolor(cmap, 'multiple');
+randp_fname_AnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_AnV_.mda',dir_pca_tmp,str_randp_threshold);
+randp_fname_ZnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_ZnV_.mda',dir_pca_tmp,str_randp_threshold);
+randp_AnV_txx__ = mda_read_r8(randp_fname_AnV_txx);
+randp_ZnV_txx__ = mda_read_r8(randp_fname_ZnV_txx);
+randp_AZnV_txx__ = randp_AnV_txx__ + randp_ZnV_txx__;
+colormap(cmap);
+scatter(randp_AZnV_txx__(:,1+0),randp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','k','Linewidth',0.1);
+xlabel('PC1');ylabel('PC2');
+%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%
+% Plot p<0.05 SNPs with scatterplot and heatmap (full dataset and
+% individual continents)
+%%%%%%%%%%%%%%%%%%
+parameter_scatterheat = struct('type','parameter_scatterheat');
+parameter_scatterheat.min_prctile = 0; %<-- percentile to use for interval minimum (default 0) ; you can increase this to crop outliers.
+parameter_scatterheat.max_prctile = 100; %<-- percentile to use for interval maximum (default 100) ; you can decrease this to crop outliers.
+parameter_scatterheat.box_expand = 1.25; %<-- relative size of interior region to box margin (default 1.25) ; you can increase this to 'zoom out'.
+parameter_scatterheat.h_DvX_scale = 0.015; %<-- colormap max/min (default 0.025); this isn't intelligently chosen; increase it to apply the heatmap over a larger range of histogram values.
+parameter_scatterheat.n_h_0= 16; %<-- number of bins in x_0 direction (e.g., horizontal) (default 32+1); increase to refine.
+parameter_scatterheat.n_h_1 = 16; %<-- number of bins in x_1 direction (e.g., vertical) (default 31+1); increase to refine.
+parameter_scatterheat.n_tick_0 = 1; %<-- place a tick-mark every n_tick_0 bins in x_0 direction (default 2); increase to have fewer tick-marks.
+parameter_scatterheat.n_tick_1 = 1; %<-- place a tick-mark every n_tick_1 bins in x_1 direction (default 2); increase to have fewer tick-marks.
+
+label_Y_y_ = pca_all(:,4) + 1; %<-- 1=ctrls, 2=cases ;
+p_threshold = 0.05;
+str_p_threshold = sprintf('%.2d',min(99,floor(100*p_threshold)));
+tmp_fname_AnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_AnV_.mda',dir_pca_tmp,str_p_threshold);
+tmp_fname_ZnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_ZnV_.mda',dir_pca_tmp,str_p_threshold);
+tmp_AnV_txx__ = mda_read_r8(tmp_fname_AnV_txx);
+tmp_ZnV_txx__ = mda_read_r8(tmp_fname_ZnV_txx);
+tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
+
+for ncontinent=1:3;
+tmp_index_Up05_ = efind(labels_out_all==ncontinent);
+figure(1+nf);nf=nf+1;clf;set(gcf,'Position',1+[0,0,1024*2,768]);
+[~,AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_] = ...
+test_scatter_and_heatmap_0( ...
+ parameter_scatterheat ...
+, label_Y_y_(1+tmp_index_Up05_) ...
+, tmp_AZnV_txx__(1+tmp_index_Up05_,:) ...
+);
+fname_fig_pre = sprintf('%s/AZnV_trnUp05_tstAp05_t%s_ncontinent%d_DandX_p01_scatter_heatmap',dir_jpg,str_p_threshold,ncontinent);
+fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
+fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
+if flag_replot | ~exist(fname_fig_jpg,'file');
+disp(sprintf(' %% %s not found, creating',fname_fig_jpg));
+print('-djpeg',fname_fig_jpg);
+print('-depsc',fname_fig_eps);
+end;%if flag_replot | ~exist(fname_fig_jpg,'file');
+end;%for ncontinent=0:3-1;
 %{
 mx__ = load_mx__from_parameter_ver0(parameter_DandX_Up99_p01);
 mr_dvx_ = 0.0*mx__.mr_A_full_;
