@@ -567,7 +567,7 @@ randp_AnV_txx__ = mda_read_r8(randp_fname_AnV_txx);
 randp_ZnV_txx__ = mda_read_r8(randp_fname_ZnV_txx);
 randp_AZnV_txx__ = randp_AnV_txx__ + randp_ZnV_txx__;
 colormap(cmap);
-scatter(randp_AZnV_txx__(:,1+0),randp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','k','Linewidth',0.1);
+scatter(randp_AZnV_txx__(:,1+0),randp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','k');
 xlabel('PC1');ylabel('PC2');
 %%%%%%%%%%%%%%%%%%
 
