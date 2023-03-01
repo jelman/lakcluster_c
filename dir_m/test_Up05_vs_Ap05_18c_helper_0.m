@@ -49,7 +49,7 @@ parameter_apm.k_use = 32; %<-- This is the initial number of nearest neighbors t
 parameter_apm.k_gamma = k_gamma_use ;
 parameter_apm.flag_disp = 0;
 parameter_apm.n_shuffle = 1; %<-- n_shuffle_interior. ;
-parameter_apm.n_shuffle_exterior = 256;
+parameter_apm.n_shuffle_exterior = 500;
 n_shuffle_exterior = parameter_apm.n_shuffle_exterior;
 
 tmp_dir = sprintf('%s/dir_%s',dir_mat_replication,str_datafile);
