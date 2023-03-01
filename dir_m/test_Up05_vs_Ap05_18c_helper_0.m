@@ -378,3 +378,51 @@ print('-depsc',fname_fig_eps);
 close(gcf);
 end;%if flag_replot | ~exist(fname_fig_jpg,'file');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%;
+% Plots for manuscripts. Display only left column with altered style;
+ntab = 0;
+tmp_x_ = linspace(0,1,n_x); tmp_y_ = linspace(0,1,n_y); tmp_z_ = linspace(0,1,n_z);
+%%%%%%%%;
+figure(1+nf);nf=nf+1;clf;figbig; p_row = 1; p_col = 3;
+linewidth_sml = 0.5; linewidth_big = 2.0; ylim_ = 10*[-1,+1];
+%%%%;
+tmp_w_ = tmp_z_; f_we__ = f_ze__; z_we__ = z_ze__; prctile_we__ = prctile_ze__; str_f_w = 'f_z_'; str_z_w = 'z_z_'; str_p_w = 'p_z_'; 
+%%%%;
+subplot(p_row,p_col,1+ntab+0);
+hold on;
+plot(tmp_w_(tmp_w_<=0.5),f_we__(tmp_w_<=0.5,2:end),'k','LineWidth',linewidth_sml,'Color',[0 0 0 0.1]);
+plot(tmp_w_(tmp_w_<=0.5),f_we__(tmp_w_<=0.5,1+0)  ,'r','LineWidth',linewidth_big);
+hold off;
+% title(str_f_w,'Interpreter','none');
+xlim([0,.50]); xlabel('fraction nearest','FontSize',16);
+ylabel('f fraction','FontSize',16);
+set(gca,'XTick',0:0.05:.50); grid on; xtickangle(90);ytickformat('%.2f'),xtickformat('%.2f')
+%%%%;
+subplot(p_row,p_col,1+ntab+1);
+hold on;
+plot(tmp_w_(tmp_w_<=0.5),max(min(ylim_),min(max(ylim_),z_we__(tmp_w_<=0.5,2:end))),'k','LineWidth',linewidth_sml,'Color',[0 0 0 0.1]);
+plot(tmp_w_(tmp_w_<=0.5),max(min(ylim_),min(max(ylim_),z_we__(tmp_w_<=0.5,1+0)  )),'r','LineWidth',linewidth_big);
+hold off;
+% title(str_z_w,'Interpreter','none');
+xlim([0,.50]); xlabel('fraction nearest','FontSize',16);
+ylim(ylim_); ylabel('z score','FontSize',16);
+set(gca,'XTick',0:0.05:.50); grid on; xtickangle(90);ytickformat('%.2f'),xtickformat('%.2f')
+%%%%;
+subplot(p_row,p_col,1+ntab+2);
+hold on;
+plot(tmp_w_(tmp_w_<=0.5),prctile_we__(tmp_w_<=0.5,1+0)  ,'r','LineWidth',linewidth_big);
+hold off;
+% title(str_p_w,'Interpreter','none');
+xlim([0,.50]); xlabel('fraction nearest','FontSize',16);
+ylim([0,1]); ylabel('1-p empirical','FontSize',16);
+set(gca,'YTick',0:0.05:1.0); set(gca,'XTick',0:0.05:.50); grid on; xtickangle(90); ytickformat('%.2f'),xtickformat('%.2f')
+set(gca,'TickLength',[0,0]);
+%%%%;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%;
+% Get composite p-value using fishers methods
+pvals = 1 - prctile_we__(tmp_w_<=.5,1+0);
+chi_vals = -2.*log(pvals);
+group_pval = 1 - chi2cdf(sum(chi_vals),2*length(pvals))
+nsig = sum(pvals < 0.05)
