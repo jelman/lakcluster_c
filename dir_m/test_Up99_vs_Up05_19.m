@@ -494,7 +494,7 @@ p_threshold_ = 0.05:0.05:1.00; n_p_threshold = numel(p_threshold_); %<-- coarse 
 %p_threshold_ = 0.60:0.005:0.65; n_p_threshold = numel(p_threshold_); %<-- finer resolution. ;
 figure(1+nf);nf=nf+1;clf;figbig;fig80s;
 markersize_use = 12;
-cmap = {'#D55E00', '#009E73', '#0072B2'};
+cmap = {'#D55E00', '#0072B2', '#009E73'};
 cmap = validatecolor(cmap, 'multiple');
 p_row = 4; p_col = ceil(n_p_threshold/p_row); np=0;
 for np_threshold=0:n_p_threshold-1;
@@ -508,7 +508,7 @@ tmp_AnV_txx__ = mda_read_r8(tmp_fname_AnV_txx);
 tmp_ZnV_txx__ = mda_read_r8(tmp_fname_ZnV_txx);
 tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
 colormap(cmap);
-scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','k','Linewidth',0.1);
+scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','#D3D3D3','Linewidth',0.5,'MarkerEdgeAlpha',.5);
 end;%if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
 xlabel('PC1');ylabel('PC2');title(sprintf('p<=%0.2f',p_threshold));
 end;%for np_threshold=0:n_p_threshold-1;
@@ -559,7 +559,7 @@ tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uAD
 % Plot results of random subset of SNPs
 dir_pca_tmp = sprintf('%s/dir_Up99/dir_test2mds_maf01_analyze/dir_test2mds_maf01_dex_p01_D_m2r1_g050/dir_pca/dir_pca_mda',dir_trunk);
 markersize_use = 12;
-cmap = {'#D55E00', '#009E73', '#0072B2'};
+cmap = {'#D55E00', '#0072B2', '#009E73'};
 cmap = validatecolor(cmap, 'multiple');
 randp_fname_AnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_AnV_.mda',dir_pca_tmp,str_randp_threshold);
 randp_fname_ZnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_ZnV_.mda',dir_pca_tmp,str_randp_threshold);
@@ -567,7 +567,7 @@ randp_AnV_txx__ = mda_read_r8(randp_fname_AnV_txx);
 randp_ZnV_txx__ = mda_read_r8(randp_fname_ZnV_txx);
 randp_AZnV_txx__ = randp_AnV_txx__ + randp_ZnV_txx__;
 colormap(cmap);
-scatter(randp_AZnV_txx__(:,1+0),randp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','k');
+scatter(randp_AZnV_txx__(:,1+0),randp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','k','Linewidth',.5);
 xlabel('PC1');ylabel('PC2');
 %%%%%%%%%%%%%%%%%%
 
@@ -580,10 +580,10 @@ parameter_scatterheat.min_prctile = 0; %<-- percentile to use for interval minim
 parameter_scatterheat.max_prctile = 100; %<-- percentile to use for interval maximum (default 100) ; you can decrease this to crop outliers.
 parameter_scatterheat.box_expand = 1.25; %<-- relative size of interior region to box margin (default 1.25) ; you can increase this to 'zoom out'.
 parameter_scatterheat.h_DvX_scale = 0.015; %<-- colormap max/min (default 0.025); this isn't intelligently chosen; increase it to apply the heatmap over a larger range of histogram values.
-parameter_scatterheat.n_h_0= 16; %<-- number of bins in x_0 direction (e.g., horizontal) (default 32+1); increase to refine.
-parameter_scatterheat.n_h_1 = 16; %<-- number of bins in x_1 direction (e.g., vertical) (default 31+1); increase to refine.
-parameter_scatterheat.n_tick_0 = 1; %<-- place a tick-mark every n_tick_0 bins in x_0 direction (default 2); increase to have fewer tick-marks.
-parameter_scatterheat.n_tick_1 = 1; %<-- place a tick-mark every n_tick_1 bins in x_1 direction (default 2); increase to have fewer tick-marks.
+parameter_scatterheat.n_h_0= 64; %<-- number of bins in x_0 direction (e.g., horizontal) (default 32+1); increase to refine.
+parameter_scatterheat.n_h_1 = 32; %<-- number of bins in x_1 direction (e.g., vertical) (default 31+1); increase to refine.
+parameter_scatterheat.n_tick_0 = 4; %<-- place a tick-mark every n_tick_0 bins in x_0 direction (default 2); increase to have fewer tick-marks.
+parameter_scatterheat.n_tick_1 = 2; %<-- place a tick-mark every n_tick_1 bins in x_1 direction (default 2); increase to have fewer tick-marks.
 
 label_Y_y_ = pca_all(:,4) + 1; %<-- 1=ctrls, 2=cases ;
 p_threshold = 0.05;
@@ -594,49 +594,43 @@ tmp_AnV_txx__ = mda_read_r8(tmp_fname_AnV_txx);
 tmp_ZnV_txx__ = mda_read_r8(tmp_fname_ZnV_txx);
 tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
 
-for ncontinent=1:3;
-tmp_index_Up05_ = efind(labels_out_all==ncontinent);
-figure(1+nf);nf=nf+1;clf;set(gcf,'Position',1+[0,0,1024*2,768]);
+% All continents
 [~,AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_] = ...
-test_scatter_and_heatmap_0( ...
+test_scatter_and_heatmap_1( ...
  parameter_scatterheat ...
+, label_Y_y_ ...
+, tmp_AZnV_txx__ ...
+);
+
+% Continent 1
+tmp_index_Up05_ = efind(tmp_AZnV_txx__(:,1)<-30);
+figure(1+nf);nf=nf+1;clf;set(gcf,'Position',1+[0,0,1024*3,768]);
+[~,AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_] = ...
+test_scatter_and_heatmap_1( ...
+parameter_scatterheat ...
 , label_Y_y_(1+tmp_index_Up05_) ...
 , tmp_AZnV_txx__(1+tmp_index_Up05_,:) ...
-);
-fname_fig_pre = sprintf('%s/AZnV_trnUp05_tstAp05_t%s_ncontinent%d_DandX_p01_scatter_heatmap',dir_jpg,str_p_threshold,ncontinent);
-fname_fig_jpg = sprintf('%s.jpg',fname_fig_pre);
-fname_fig_eps = sprintf('%s.eps',fname_fig_pre);
-if flag_replot | ~exist(fname_fig_jpg,'file');
-disp(sprintf(' %% %s not found, creating',fname_fig_jpg));
-print('-djpeg',fname_fig_jpg);
-print('-depsc',fname_fig_eps);
-end;%if flag_replot | ~exist(fname_fig_jpg,'file');
-end;%for ncontinent=0:3-1;
-%{
-mx__ = load_mx__from_parameter_ver0(parameter_DandX_Up99_p01);
-mr_dvx_ = 0.0*mx__.mr_A_full_;
-mr_dvx_(1+efind(mx__.mr_A_full_))=2;
-mr_dvx_(1+efind(mx__.mr_Z_full_))=1;
-if flag_disp;
-figure(1+nf);nf=nf+1;clf;figmed;fig80s;
-%%%%;
-subplot(1,2,1);
-%scatter3(AZnV_DandX_Up99_p01_(:,1),AZnV_DandX_Up99_p01_(:,2),AZnV_DandX_Up99_p01_(:,3),8,mr_dvx_,'filled');
-scatter(AZnV_DandX_Up99_p01_(:,1),AZnV_DandX_Up99_p01_(:,2),8,mr_dvx_,'filled');
-xlabel('pc0'); ylabel('pc1'); title('case magenta, ctrl cyan');
-axis equal; axis vis3d;
-%%%%;
-subplot(1,2,2);
-scatter(AZnV_DandX_Up99_p01_(:,1),AZnV_DandX_Up99_p01_(:,2),8,mr_Up99_p01_continent_,'filled');
-xlabel('pc0'); ylabel('pc1'); title('continent 0,1,2');
-axis equal; axis vis3d;
-%%%%;
-fname_fig = sprintf('/%s/rangan/dir_bcc/dir_jelman/dir_Up99/Up99_DandX_p01_FIGA',str_home);
-print('-djpeg',sprintf('%s.jpg',fname_fig));
-print('-depsc',sprintf('%s.eps',fname_fig));
-end;%if flag_disp;
-%%%%%%%%;
- %}
+, AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_);
+
+% Continent 2
+tmp_index_Up05_ = efind(tmp_AZnV_txx__(:,1)>67);
+figure(1+nf);nf=nf+1;clf;set(gcf,'Position',1+[0,0,1024*2,768]);
+[~,AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_] = ...
+test_scatter_and_heatmap_1( ...
+parameter_scatterheat ...
+, label_Y_y_(1+tmp_index_Up05_) ...
+, tmp_AZnV_txx__(1+tmp_index_Up05_,:) ...
+, AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_);
+
+% Continent 3
+tmp_index_Up05_ = efind(tmp_AZnV_txx__(:,2)>154)
+figure(1+nf);nf=nf+1;clf;set(gcf,'Position',1+[0,0,1024*2,768]);
+[~,AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_] = ...
+test_scatter_and_heatmap_1( ...
+parameter_scatterheat ...
+, label_Y_y_(1+tmp_index_Up05_) ...
+, tmp_AZnV_txx__(1+tmp_index_Up05_,:)...
+, AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_);
 
 
 end;%if flag_calc;
