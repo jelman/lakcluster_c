@@ -510,7 +510,7 @@ tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
 colormap(cmap);
 scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','#D3D3D3','Linewidth',0.5,'MarkerEdgeAlpha',.5);
 end;%if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
-xlabel('PC1');ylabel('PC2');title(sprintf('p<=%0.2f',p_threshold));
+xlabel('PC1');ylabel('PC2');title(sprintf('p<%0.2f',p_threshold));
 end;%for np_threshold=0:n_p_threshold-1;
 %%%%%%%%;
 print('-djpeg',fname_fig_jpg);
