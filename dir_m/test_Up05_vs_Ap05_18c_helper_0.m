@@ -425,7 +425,17 @@ xlabel('fraction nearest','FontSize',18);
 ylabel('1-p empirical','FontSize',18);
 
 %%%%;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Save out max z of replication and index ;
+[max_z, max_idx] = max(z_we__(tmp_w_<=0.5,1+0))
+% Get fraction of training set to use as nearest neighbors that ;
+% produces the max replication z ;
+max_f = tmp_w_(max_idx);
+tmp_fname_max_f = sprintf('%s/%s_max_f.txt',tmp_dir,str_datafile);
+% write max_f to file
+tmp_fid = fopen(tmp_fname_max_f,'w');
+fprintf(tmp_fid,'%f',max_f);
+fclose(tmp_fid);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%;
 % Get composite p-value using fishers methods
 pvals = 1 - prctile_we__(tmp_w_<=.5,1+0);
