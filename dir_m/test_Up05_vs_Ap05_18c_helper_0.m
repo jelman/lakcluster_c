@@ -436,9 +436,3 @@ tmp_fname_max_f = sprintf('%s/%s_max_f.txt',tmp_dir,str_datafile);
 tmp_fid = fopen(tmp_fname_max_f,'w');
 fprintf(tmp_fid,'%f',max_f);
 fclose(tmp_fid);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%;
-% Get composite p-value using fishers methods
-pvals = 1 - prctile_we__(tmp_w_<=.5,1+0);
-chi_vals = -2.*log(pvals);
-group_pval = 1 - chi2cdf(sum(chi_vals),2*length(pvals))
-nsig = sum(pvals < 0.05)
