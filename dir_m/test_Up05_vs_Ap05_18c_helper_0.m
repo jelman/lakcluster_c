@@ -32,9 +32,9 @@ if ~exist(dir_jpg_replication,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg_replic
 %%%%%%%%;
 % Now load one of the data-files containing the projected values and labels. ;
 %%%%%%%%;
-ncontinent = 1; 
+ncontinent = 2; 
 str_datafile = sprintf('trnUp05_tst_Ap05_ncontinent%d',ncontinent); 
-k_gamma_use = 0.50; %<-- Continent1 converges at .50, continent2 must be lowered to 0.15 ;
+k_gamma_use = 0.15; %<-- Continent1 converges at .50, continent2 must be lowered to 0.15 ;
 %%%%%%%%;
 % Alternatively, we can load the data from jeremey sent on 20230114. ;
 %%%%%%%%;

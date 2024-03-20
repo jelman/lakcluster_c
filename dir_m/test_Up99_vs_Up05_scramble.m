@@ -240,18 +240,18 @@ end;%if (flag_disp);
 if (flag_verbose); disp(sprintf(' %% ')); end;
 if (flag_verbose); disp(sprintf(' %% We divide Up99 data into three continents. ;')); end;
 mr_Up99_p01_continent_ = textread(sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt',dir_trunk));
-n_continent = max(mr_Up99_p01_continent_)+1; %<-- continent index is zero-based. ;
+n_continent = max(mr_Up99_p01_continent_)+1; %<-- continent index is zero-based, n_continent should be 1-based. ;
 mr_Up99_p01_continent_pc__ = zeros(n_patient_Up99,n_continent);
-for ncontinent=0:n_continent-1;
+for ncontinent=0:n_continent-1; %<-- n_continent is 1-based, ncontinent is 0-based
 mr_Up99_p01_continent_pc__(:,1+ncontinent) = (mr_Up99_p01_continent_==ncontinent);
 end;%for ncontinent=0:n_continent-1;
 %%%%%%%%;
 if (flag_verbose); disp(sprintf(' %% ')); end;
 if (flag_verbose); disp(sprintf(' %% We divide Up05 data into three continents. ;')); end;
 mr_Up05_p01_continent_ = textread(sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
-n_continent = max(mr_Up05_p01_continent_)+1; %<-- continent index is zero-based. ;
+n_continent = max(mr_Up05_p01_continent_)+1; %<-- continent index is zero-based, n_continent should be 1-based. ;
 mr_Up05_p01_continent_pc__ = zeros(n_patient_Up05,n_continent);
-for ncontinent=0:n_continent-1;
+for ncontinent=0:n_continent-1; %<-- n_continent is 1-based, ncontinent is 0-based
 mr_Up05_p01_continent_pc__(:,1+ncontinent) = (mr_Up05_p01_continent_==ncontinent);
 end;%for ncontinent=0:n_continent-1;
 %%%%%%%%;
@@ -342,7 +342,7 @@ str_lak_vs_dex = 'dex';
 str_prefix = 'test2mds_maf01';
 gamma = 0.05;
 % Set name of continent of interest
-str_mr_0in = 'continent2';
+str_mr_0in = 'continent1';
 str_mc_0in = '';
 n_mds_0in = 2; n_mds_repl = 1; ij_mds_use_ = [1:2];
 parameter_Up05 = struct('type','parameter');

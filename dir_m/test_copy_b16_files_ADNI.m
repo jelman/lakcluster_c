@@ -100,6 +100,7 @@ for nl=0:n_l-1;
 tmp_filename_0in = filename_list_{1+nl};
 fname_0in = sprintf('%s/%s',dir_0in,tmp_filename_0in);
 tmp_ij = strfind(tmp_filename_0in,'Ap05');
+% Use index tmp_ij+4:end for Ap05; use index tmp_ij+8:end for AFULLp05
 tmp_filename_out = sprintf('%s%s','test2mds',tmp_filename_0in(tmp_ij+4:end));
 fname_out = sprintf('%s/%s',dir_out,tmp_filename_out);
 if  exist(fname_0in,'file') & ~exist(fname_out,'file');
@@ -130,8 +131,3 @@ str_command = sprintf(' ln -s %s %s',fname_sou,fname_del);
 disp(sprintf('%s',str_command));
 system(str_command);
 end;%if  exist(fname_del,'file') &  exist(fname_sou,'file');
-
-
-
-
-

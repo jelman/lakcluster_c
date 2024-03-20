@@ -1,6 +1,6 @@
 %%%%%%%%;
-% This script is technically entitled Up99_vs_Ap05, ;
-% because I wanted to compare the Up99 vs the Ap05 data. ;
+% This script is technically entitled Up99_vs_AFULLp05, ;
+% because I wanted to compare the Up99 vs the AFULLp05 data. ;
 % However, because the Up99 data is large (and takes a while to load), ;
 % I used the smaller Up05 dataset instead. ;
 % Thus, if you really want to use the Up99 data, ;
@@ -14,7 +14,7 @@ flag_verbose = 1;
 flag_disp = 1+flag_verbose; nf=0;
 flag_replot = 0;
 if (flag_verbose); disp(sprintf(' %% ;')); end;
-if (flag_verbose); disp(sprintf(' %% Comparing Up05 with Ap05 data. ;')); end;
+if (flag_verbose); disp(sprintf(' %% Comparing Up05 with AFULLp05 data. ;')); end;
 if (flag_verbose); disp(sprintf(' %% Assume path is set using dir_lakcluster_c/dir_m/setup_0.m. ;')); end;
 
 if (flag_verbose); disp(sprintf(' %% Comparing Up99 with Up05 data. ;')); end;
@@ -27,7 +27,7 @@ dir_jpg = sprintf('%s/dir_jpg',dir_trunk);
 if ~exist(dir_jpg,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg)); mkdir(dir_jpg); end;
 
 n_dataset = 2;
-str_dataset_ = {'Up05','Ap05'};
+str_dataset_ = {'Up05','AFULLp05'};
 dataset_ = cell(n_dataset,1);
 for ndataset=0:n_dataset-1;
 dataset = struct('type','dataset');
@@ -120,26 +120,38 @@ dataset_{1+ndataset}.mx__ = mx__;
 end;%for ndataset=0:n_dataset-1;
 
 ndataset_Up05 = 0;
-ndataset_Ap05 = 1;
+ndataset_AFULLp05 = 1;
 n_snp_Up05 = dataset_{1+ndataset_Up05}.n_snp;
-n_snp_Ap05 = dataset_{1+ndataset_Ap05}.n_snp;
+n_snp_AFULLp05 = dataset_{1+ndataset_AFULLp05}.n_snp;
 if (flag_verbose); disp(sprintf(' %% intersecting allele subsets')); end;
 tmp_t = tic();
-[allele_cap_,ij_Up05_from_cap_,ij_Ap05_from_cap_] = intersect(dataset_{1+ndataset_Up05}.bim_name_,dataset_{1+ndataset_Ap05}.bim_name_,'stable');
+[allele_cap_,ij_Up05_from_cap_,ij_AFULLp05_from_cap_] = intersect(dataset_{1+ndataset_Up05}.bim_name_,dataset_{1+ndataset_AFULLp05}.bim_name_,'stable');
 tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% intersect: %0.6fs',tmp_t)); end;
 index_Up05_from_cap_ = ij_Up05_from_cap_ - 1;
-index_Ap05_from_cap_ = ij_Ap05_from_cap_ - 1;
-ij_Up05_from_Ap05__ = sparse(ij_Up05_from_cap_,ij_Ap05_from_cap_,1,n_snp_Up05,n_snp_Ap05);
-ij_Ap05_from_Up05__ = sparse(ij_Ap05_from_cap_,ij_Up05_from_cap_,1,n_snp_Ap05,n_snp_Up05);
+index_AFULLp05_from_cap_ = ij_AFULLp05_from_cap_ - 1;
+ij_Up05_from_AFULLp05__ = sparse(ij_Up05_from_cap_,ij_AFULLp05_from_cap_,1,n_snp_Up05,n_snp_AFULLp05);
+ij_AFULLp05_from_Up05__ = sparse(ij_AFULLp05_from_cap_,ij_Up05_from_cap_,1,n_snp_AFULLp05,n_snp_Up05);
 index_Up05_setminus_cap_ = setdiff(efind(dataset_{1+ndataset_Up05}.mx__.mc_A_),index_Up05_from_cap_);
-index_Ap05_setminus_cap_ = setdiff(efind(dataset_{1+ndataset_Ap05}.mx__.mc_A_),index_Ap05_from_cap_);
+index_AFULLp05_setminus_cap_ = setdiff(efind(dataset_{1+ndataset_AFULLp05}.mx__.mc_A_),index_AFULLp05_from_cap_);
 if (flag_verbose);
 disp(sprintf(' %% number of alleles in common: %d',numel(allele_cap_)));
 disp(sprintf(' %% number of alleles from Up05: %d/%d',numel(ij_Up05_from_cap_),numel(dataset_{1+ndataset_Up05}.bim_name_)));
-disp(sprintf(' %% number of alleles from Ap05: %d/%d',numel(ij_Ap05_from_cap_),numel(dataset_{1+ndataset_Ap05}.bim_name_)));
+disp(sprintf(' %% number of alleles from AFULLp05: %d/%d',numel(ij_AFULLp05_from_cap_),numel(dataset_{1+ndataset_AFULLp05}.bim_name_)));
 end;%if (flag_verbose);
 
 pca_rank_use = 2; %<-- number of principal-components to compute. ;
+
+%%%%%%%%;
+% Add MCI subjects to case array mask ;
+%%%%%%%%; 
+pheno_val = 3; % <-- phenotype value to include as cases
+pheno_idx = (dataset_{1+ndataset}.fam_dvx_==pheno_val);
+ndataset=ndataset_AFULLp05;
+dataset_{1+ndataset}.mx__.mr_A__{1}(pheno_idx) = 1;
+dataset_{1+ndataset}.mx__.mr_A_default__{1}(pheno_idx) = 1;
+dataset_{1+ndataset}.mx__.mr_A_default_full_(pheno_idx) = 1;
+dataset_{1+ndataset}.mx__.mr_A_full_(pheno_idx) = 1;
+dataset_{1+ndataset}.mx__.mr_D_(pheno_idx) = 1;
 
 %%%%%%%%;
 % First calculate pca of D_Up05_p01. ;
@@ -240,9 +252,9 @@ end;%if flag_disp;
 
 
 %%%%%%%%;
-% Now calculate pca of D_Up05_cap_Ap05_p01. ;
+% Now calculate pca of D_Up05_cap_AFULLp05_p01. ;
 %%%%%%%%;
-fname_fig = sprintf('%s/D_Up05_cap_Ap05_p01_scatter_FIGA',dir_jpg);
+fname_fig = sprintf('%s/D_Up05_cap_AFULLp05_p01_scatter_FIGA',dir_jpg);
 if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
 figure(1+nf);nf=nf+1;clf;figbig;fig80s;
 markersize_use = 12;
@@ -277,21 +289,21 @@ tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% mc_from_bim_ext_ver5: %
 end;%if  exist(tmp_fname_bim,'file');
 tmp_index_ = randperm(numel(index_Up05_setminus_cap_),floor(f*numel(index_Up05_setminus_cap_))) - 1;
 pca_mc_A(1+index_Up05_setminus_cap_(1+tmp_index_)) = 0;
-pca_str_infix='D_Up05_cap_Ap05_p01';
-parameter_D_Up05_cap_Ap05_p01 = tmp_parameter;
+pca_str_infix='D_Up05_cap_AFULLp05_p01';
+parameter_D_Up05_cap_AFULLp05_p01 = tmp_parameter;
 clear tmp_parameter;
 %%%%;
-parameter_D_Up05_cap_Ap05_p01.str_A_p = str_Up05_A_p_p01;
-parameter_D_Up05_cap_Ap05_p01.str_name_s0000 = 'pca_D_Up05_cap_Ap05_p01';
+parameter_D_Up05_cap_AFULLp05_p01.str_A_p = str_Up05_A_p_p01;
+parameter_D_Up05_cap_AFULLp05_p01.str_name_s0000 = 'pca_D_Up05_cap_AFULLp05_p01';
 [ ...
- parameter_D_Up05_cap_Ap05_p01 ...
-,AZnV_D_Up05_cap_Ap05_p01_ ...
-,AnV_D_Up05_cap_Ap05_p01_ ...
-,ZnV_D_Up05_cap_Ap05_p01_ ...
-,V_D_Up05_cap_Ap05_p01_ ...
+ parameter_D_Up05_cap_AFULLp05_p01 ...
+,AZnV_D_Up05_cap_AFULLp05_p01_ ...
+,AnV_D_Up05_cap_AFULLp05_p01_ ...
+,ZnV_D_Up05_cap_AFULLp05_p01_ ...
+,V_D_Up05_cap_AFULLp05_p01_ ...
 ] = ...
 xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
- parameter_D_Up05_cap_Ap05_p01 ...
+ parameter_D_Up05_cap_AFULLp05_p01 ...
 ,pca_rank ...
 ,pca_mr_A_ ...
 ,pca_mr_Z_ ...
@@ -305,7 +317,7 @@ mr_dvx_Up05_ = zeros(dataset_{1+ndataset}.n_patient,1);
 mr_dvx_Up05_(1+tmp_index_A_) = 1;
 mr_dvx_Up05_(1+tmp_index_Z_) = 0;
 subplot(p_row,p_col,1+np);np=np+1;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled','MarkerEdgeColor','k');
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled','MarkerEdgeColor','k');
 axis equal; grid on;
 title(sprintf('%0.3f (%d)',f,sum(pca_mc_A))); xlabel('PC1'); ylabel('PC2');
 drawnow();
@@ -319,7 +331,7 @@ print('-depsc',sprintf('%s.eps',fname_fig));
 end;%if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
 
 %%%%%%%%;
-% Now rerun the final projection of D_Up05_cap_Ap05_p01. ;
+% Now rerun the final projection of D_Up05_cap_AFULLp05_p01. ;
 % Make sure that this is restricted to the intersection. ;
 %%%%%%%%;
 tmp_parameter = dataset_{1+ndataset}.parameter;
@@ -344,21 +356,21 @@ pca_mc_A = mc_from_bim_ext_ver5(tmp_fname_bim,tmp_parameter.maf_lo_threshold,tmp
 tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% mc_from_bim_ext_ver5: %0.6fs',tmp_t)); end;
 end;%if  exist(tmp_fname_bim,'file');
 pca_mc_A(1+index_Up05_setminus_cap_) = 0;
-pca_str_infix='D_Up05_cap_Ap05_p01';
-parameter_D_Up05_cap_Ap05_p01 = tmp_parameter;
+pca_str_infix='D_Up05_cap_AFULLp05_p01';
+parameter_D_Up05_cap_AFULLp05_p01 = tmp_parameter;
 clear tmp_parameter;
 %%%%;
-parameter_D_Up05_cap_Ap05_p01.str_A_p = str_Up05_A_p_p01;
-parameter_D_Up05_cap_Ap05_p01.str_name_s0000 = 'pca_D_Up05_cap_Ap05_p01';
+parameter_D_Up05_cap_AFULLp05_p01.str_A_p = str_Up05_A_p_p01;
+parameter_D_Up05_cap_AFULLp05_p01.str_name_s0000 = 'pca_D_Up05_cap_AFULLp05_p01';
 [ ...
- parameter_D_Up05_cap_Ap05_p01 ...
-,AZnV_D_Up05_cap_Ap05_p01_ ...
-,AnV_D_Up05_cap_Ap05_p01_ ...
-,ZnV_D_Up05_cap_Ap05_p01_ ...
-,V_D_Up05_cap_Ap05_p01_ ...
+ parameter_D_Up05_cap_AFULLp05_p01 ...
+,AZnV_D_Up05_cap_AFULLp05_p01_ ...
+,AnV_D_Up05_cap_AFULLp05_p01_ ...
+,ZnV_D_Up05_cap_AFULLp05_p01_ ...
+,V_D_Up05_cap_AFULLp05_p01_ ...
 ] = ...
 xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
- parameter_D_Up05_cap_Ap05_p01 ...
+ parameter_D_Up05_cap_AFULLp05_p01 ...
 ,pca_rank ...
 ,pca_mr_A_ ...
 ,pca_mr_Z_ ...
@@ -373,31 +385,31 @@ mr_dvx_Up05_(1+tmp_index_A_) = 1;
 mr_dvx_Up05_(1+tmp_index_Z_) = 0;
 if flag_disp;
 figure(1+nf);nf=nf+1;clf;figsml;fig80s;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled','MarkerEdgeColor','k');
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled','MarkerEdgeColor','k');
 axis equal; grid on;
-title(sprintf('D_Up05_cap_Ap05_p01'),'Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title(sprintf('D_Up05_cap_AFULLp05_p01'),'Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 end;%if flag_disp;
 %%%%%%%%;
-parameter_D_Up05_cap_Ap05_p01.pca_str_infix = pca_str_infix;
+parameter_D_Up05_cap_AFULLp05_p01.pca_str_infix = pca_str_infix;
 
 %%%%%%%%;
-% Now project Ap05 data onto the same principal-components. ;
+% Now project AFULLp05 data onto the same principal-components. ;
 %%%%%%%%;
-parameter_D_Up05_cap_Ap05_p01.str_V_ = sprintf('%s/dir_pca/dir_pca_mda/pca_D_%s_k%d_B44_V_.mda',parameter_D_Up05_cap_Ap05_p01.dir_out_s0000,parameter_D_Up05_cap_Ap05_p01.pca_str_infix,pca_rank);
-if ~exist(parameter_D_Up05_cap_Ap05_p01.str_V_,'file');
-disp(sprintf(' %% Warning, %s not found',parameter_D_Up05_cap_Ap05_p01.str_V_));
-end;%if ~exist(parameter_D_Up05_cap_Ap05_p01.str_V_,'file');
-D_Up05_cap_Ap05_p01_V_ = mda_read_r8(parameter_D_Up05_cap_Ap05_p01.str_V_);
+parameter_D_Up05_cap_AFULLp05_p01.str_V_ = sprintf('%s/dir_pca/dir_pca_mda/pca_D_%s_k%d_B44_V_.mda',parameter_D_Up05_cap_AFULLp05_p01.dir_out_s0000,parameter_D_Up05_cap_AFULLp05_p01.pca_str_infix,pca_rank);
+if ~exist(parameter_D_Up05_cap_AFULLp05_p01.str_V_,'file');
+disp(sprintf(' %% Warning, %s not found',parameter_D_Up05_cap_AFULLp05_p01.str_V_));
+end;%if ~exist(parameter_D_Up05_cap_AFULLp05_p01.str_V_,'file');
+D_Up05_cap_AFULLp05_p01_V_ = mda_read_r8(parameter_D_Up05_cap_AFULLp05_p01.str_V_);
 if (flag_verbose); disp(sprintf(' %% size of intersection: %d',numel(index_Up05_from_cap_))); end;
-if (flag_verbose); disp(sprintf(' %% Support of V_: %d',sum(abs(D_Up05_cap_Ap05_p01_V_(:,1))>0))); end;
-if (flag_verbose); disp(sprintf(' %% intersection of supp(V_) with cap: %d',numel(intersect(index_Up05_from_cap_,efind(abs(D_Up05_cap_Ap05_p01_V_(:,1))>0))))); end;
-D_Ap05_from_Up05_cap_Ap05_p01_V_ = ij_Ap05_from_Up05__*D_Up05_cap_Ap05_p01_V_;
-if (flag_verbose); disp(sprintf(' %% fnorm(D_Ap05_from_Up05_cap_Ap05_p01_V_(ij_Ap05_from_cap_,:) - D_Up05_cap_Ap05_p01_V_(ij_Up05_from_cap_,:)): %0.16f',fnorm(D_Ap05_from_Up05_cap_Ap05_p01_V_(ij_Ap05_from_cap_,:) - D_Up05_cap_Ap05_p01_V_(ij_Up05_from_cap_,:)))); end;
+if (flag_verbose); disp(sprintf(' %% Support of V_: %d',sum(abs(D_Up05_cap_AFULLp05_p01_V_(:,1))>0))); end;
+if (flag_verbose); disp(sprintf(' %% intersection of supp(V_) with cap: %d',numel(intersect(index_Up05_from_cap_,efind(abs(D_Up05_cap_AFULLp05_p01_V_(:,1))>0))))); end;
+D_AFULLp05_from_Up05_cap_AFULLp05_p01_V_ = ij_AFULLp05_from_Up05__*D_Up05_cap_AFULLp05_p01_V_;
+if (flag_verbose); disp(sprintf(' %% fnorm(D_AFULLp05_from_Up05_cap_AFULLp05_p01_V_(ij_AFULLp05_from_cap_,:) - D_Up05_cap_AFULLp05_p01_V_(ij_Up05_from_cap_,:)): %0.16f',fnorm(D_AFULLp05_from_Up05_cap_AFULLp05_p01_V_(ij_AFULLp05_from_cap_,:) - D_Up05_cap_AFULLp05_p01_V_(ij_Up05_from_cap_,:)))); end;
 
 %%%%%%%%;
-% Now calculate pca of D_Ap05_p01. ;
+% Now calculate pca of D_AFULLp05_p01. ;
 %%%%%%%%;
-ndataset=ndataset_Ap05;
+ndataset=ndataset_AFULLp05;
 tmp_parameter = dataset_{1+ndataset}.parameter;
 if (flag_verbose); disp(sprintf(' %% tmp_parameter.dir_0in: %s',tmp_parameter.dir_0in)); end;
 if (flag_verbose); disp(sprintf(' %% tmp_parameter.str_prefix: %s',tmp_parameter.str_prefix)); end;
@@ -418,65 +430,69 @@ tmp_t = tic();
 pca_mc_A = mc_from_bim_ext_ver5(tmp_fname_bim,tmp_parameter.maf_lo_threshold,tmp_parameter.maf_hi_threshold);
 tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% mc_from_bim_ext_ver5: %0.6fs',tmp_t)); end;
 end;%if  exist(tmp_fname_bim,'file');
-pca_str_infix='D_Ap05_p01';
-parameter_D_Ap05_p01 = tmp_parameter;
+pca_str_infix='D_AFULLp05_p01';
+parameter_D_AFULLp05_p01 = tmp_parameter;
 clear tmp_parameter;
 %%%%;
-parameter_Ap05_A_p_p01 = parameter_D_Ap05_p01;
-parameter_Ap05_A_p_p01.str_name_s0000 = 'A_p_p01';
+parameter_AFULLp05_A_p_p01 = parameter_D_AFULLp05_p01;
+parameter_AFULLp05_A_p_p01.str_name_s0000 = 'A_p_p01';
 [ ...
- parameter_Ap05_A_p_p01 ...
-,str_Ap05_A_p_p01 ...
+ parameter_AFULLp05_A_p_p01 ...
+,str_AFULLp05_A_p_p01 ...
 ] = ...
 xxxcluster_fromdisk_uADZSZDA_A_p_from_mx_ver16( ...
- parameter_Ap05_A_p_p01 ...
+ parameter_AFULLp05_A_p_p01 ...
 ,pca_mr_A_ ...
 ,pca_mr_Z_ ...
 ,pca_mc_A ...
 ,pca_str_infix ...
-);
-A_p_p01_ = mda_read_r8(str_Ap05_A_p_p01); 
+,dataset_{1+ndataset}.mx__);
+A_p_p01_ = mda_read_r8(str_AFULLp05_A_p_p01); 
 if (flag_disp);
 figure(1+nf);nf=nf+1;clf;figsml;
 plot(A_p_p01_);
 xlabel('pcol');ylabel('A_p','Interpreter','none');
-title(str_Ap05_A_p_p01,'Interpreter','none');
+title(str_AFULLp05_A_p_p01,'Interpreter','none');
 end;%if (flag_disp);
 %%%%;
-parameter_D_Ap05_p01.str_A_p = str_Ap05_A_p_p01;
-parameter_D_Ap05_p01.str_name_s0000 = 'pca_D_Ap05_p01';
+parameter_D_AFULLp05_p01.str_A_p = str_AFULLp05_A_p_p01;
+parameter_D_AFULLp05_p01.str_name_s0000 = 'pca_D_AFULLp05_p01';
 [ ...
- parameter_D_Ap05_p01 ...
-,AZnV_D_Ap05_p01_ ...
-,AnV_D_Ap05_p01_ ...
-,ZnV_D_Ap05_p01_ ...
-,V_D_Ap05_p01_ ...
+ parameter_D_AFULLp05_p01 ...
+,AZnV_D_AFULLp05_p01_ ...
+,AnV_D_AFULLp05_p01_ ...
+,ZnV_D_AFULLp05_p01_ ...
+,V_D_AFULLp05_p01_ ...
 ] = ...
 xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
- parameter_D_Ap05_p01 ...
+ parameter_D_AFULLp05_p01 ...
 ,pca_rank ...
 ,pca_mr_A_ ...
 ,pca_mr_Z_ ...
 ,pca_mc_A ...
 ,pca_str_infix ...
+,dataset_{1+ndataset}.mx__ ...
 );
 %%%%;
 tmp_index_A_ = efind(dataset_{1+ndataset}.mx__.mr_A_full_);
 tmp_index_Z_ = efind(dataset_{1+ndataset}.mx__.mr_Z_full_);
-mr_dvx_Ap05_ = zeros(dataset_{1+ndataset}.n_patient,1);
-mr_dvx_Ap05_(1+tmp_index_A_) = 1;
-mr_dvx_Ap05_(1+tmp_index_Z_) = 0;
+mr_dvx_AFULLp05_ = zeros(dataset_{1+ndataset}.n_patient,1);
+mr_dvx_AFULLp05_(1+tmp_index_A_) = 1;
+mr_dvx_AFULLp05_(1+tmp_index_Z_) = 0;
 figure(1+nf);nf=nf+1;clf;figsml;fig80s;
 markersize_use = 12;
-scatter(AZnV_D_Ap05_p01_(:,1+0),AZnV_D_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Ap05_,'filled','MarkerEdgeColor','k');
+scatter(AZnV_D_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_AFULLp05_,'filled','MarkerEdgeColor','k');
 axis equal; grid on;
-title('AZnV_D_Ap05_p01_','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title('AZnV_D_AFULLp05_p01_','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%;
 
 %%%%%%%%;
-% Now project Ap05 data onto D_Ap05_from_Up05_cap_Ap05_p01_V_. ;
+% Now project AFULLp05 data onto D_AFULLp05_from_Up05_cap_AFULLp05_p01_V_. ;
+% To calculate loadings for all all subjects (i.e., not just ;
+% cases/controls), masks used in PCA must be altered. Assign additional '
+% subjects a value of "1" in either pca_mr_A_ or pca_mr_Z_ arrays ; 
 %%%%%%%%;
-ndataset=ndataset_Ap05;
+ndataset=ndataset_AFULLp05;
 tmp_parameter = dataset_{1+ndataset}.parameter;
 if (flag_verbose); disp(sprintf(' %% tmp_parameter.dir_0in: %s',tmp_parameter.dir_0in)); end;
 if (flag_verbose); disp(sprintf(' %% tmp_parameter.str_prefix: %s',tmp_parameter.str_prefix)); end;
@@ -486,7 +502,7 @@ tmp_parameter.maf_hi_threshold = 0.50;
 tmp_parameter.gamma = 0.05; %<-- not used for pca calculation. ;
 tmp_parameter.flag_verbose = 0;
 tmp_parameter.flag_force_create = 1;
-pca_rank = pca_rank_use;
+pca_rank = pca_rank_use;;
 pca_mr_A_={dataset_{1+ndataset}.mx__.mr_A_full_};
 pca_mr_Z_={dataset_{1+ndataset}.mx__.mr_Z_full_};
 tmp_fname_bim = sprintf('%s/%s_bim.ext',tmp_parameter.dir_0in,tmp_parameter.str_prefix);
@@ -497,67 +513,68 @@ tmp_t = tic();
 pca_mc_A = mc_from_bim_ext_ver5(tmp_fname_bim,tmp_parameter.maf_lo_threshold,tmp_parameter.maf_hi_threshold);
 tmp_t = toc(tmp_t); if (flag_verbose); disp(sprintf(' %% mc_from_bim_ext_ver5: %0.6fs',tmp_t)); end;
 end;%if  exist(tmp_fname_bim,'file');
-pca_str_infix='D_Ap05_from_Up05_cap_Ap05_p01';
-parameter_D_Ap05_from_Up05_cap_Ap05_p01 = tmp_parameter;
+pca_str_infix='D_AFULLp05_from_Up05_cap_AFULLp05_p01';
+parameter_D_AFULLp05_from_Up05_cap_AFULLp05_p01 = tmp_parameter;
 clear tmp_parameter;
 %%%%;
-parameter_D_Ap05_from_Up05_cap_Ap05_p01.str_A_p = str_Ap05_A_p_p01;
-parameter_D_Ap05_from_Up05_cap_Ap05_p01.str_name_s0000 = 'pca_D_Ap05_from_Up05_cap_Ap05_p01';
+parameter_D_AFULLp05_from_Up05_cap_AFULLp05_p01.str_A_p = str_AFULLp05_A_p_p01;
+parameter_D_AFULLp05_from_Up05_cap_AFULLp05_p01.str_name_s0000 = 'pca_D_AFULLp05_from_Up05_cap_AFULLp05_p01';
 [ ...
- parameter_D_Ap05_from_Up05_cap_Ap05_p01 ...
-,AZnV_D_Ap05_from_Up05_cap_Ap05_p01_ ...
-,AnV_D_Ap05_from_Up05_cap_Ap05_p01_ ...
-,ZnV_D_Ap05_from_Up05_cap_Ap05_p01_ ...
+ parameter_D_AFULLp05_from_Up05_cap_AFULLp05_p01 ...
+,AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_ ...
+,AnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_ ...
+,ZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_ ...
 ,tmp_V_ ...
 ] = ...
 xxxcluster_fromdisk_uADZSZDA_pca_proj_from_mx_ver16( ...
- parameter_D_Ap05_from_Up05_cap_Ap05_p01 ...
+ parameter_D_AFULLp05_from_Up05_cap_AFULLp05_p01 ...
 ,pca_rank ...
-,D_Ap05_from_Up05_cap_Ap05_p01_V_ ...
+,D_AFULLp05_from_Up05_cap_AFULLp05_p01_V_ ...
 ,pca_mr_A_ ...
 ,pca_mr_Z_ ...
 ,pca_mc_A ...
 ,pca_str_infix ...
+,dataset_{1+ndataset}.mx__ ...
 );
 %%%%;
 tmp_index_A_ = efind(dataset_{1+ndataset}.mx__.mr_A_full_);
 tmp_index_Z_ = efind(dataset_{1+ndataset}.mx__.mr_Z_full_);
-mr_dvx_Ap05_ = zeros(dataset_{1+ndataset}.n_patient,1);
-mr_dvx_Ap05_(1+tmp_index_A_) = 1;
-mr_dvx_Ap05_(1+tmp_index_Z_) = 0;
+mr_dvx_AFULLp05_ = zeros(dataset_{1+ndataset}.n_patient,1);
+mr_dvx_AFULLp05_(1+tmp_index_A_) = 1;
+mr_dvx_AFULLp05_(1+tmp_index_Z_) = 0;
 figure(1+nf);nf=nf+1;clf;figsml;fig80s;
 markersize_use = 12;
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Ap05_,'filled','MarkerEdgeColor','k');
+scatter(AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_AFULLp05_,'filled','MarkerEdgeColor','k');
 axis equal; grid on;
-title('AZnV_D_Ap05_from_Up05_cap_Ap05_p01_','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title('AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%;
 
 %%%%%%%%;
-fname_fig = sprintf('%s/D_Ap05_from_Up05_cap_Ap05_p01_scatter_FIGA',dir_jpg);
+fname_fig = sprintf('%s/D_AFULLp05_from_Up05_cap_AFULLp05_p01_scatter_FIGA',dir_jpg);
 if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
 figure(1+nf);nf=nf+1;clf;figbig;fig80s;
 markersize_use = 12;
 np=0;
 %%%%;
 subplot(2,2,1+np);np=np+1;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled','MarkerEdgeColor',0.15*[1,1,1],'LineWidth',0.5);
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_Up05_p01_continent_,'filled','MarkerEdgeColor',0.15*[1,1,1],'LineWidth',0.5);
 axis equal; grid on;
-title('AZnV_D_Up05_cap_Ap05_p01_ (by continent)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title('AZnV_D_Up05_cap_AFULLp05_p01_ (by continent)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%;
 subplot(2,2,1+np);np=np+1;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Up05_,'filled','MarkerEdgeColor',0.15*[1,1,1],'LineWidth',0.5);
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_Up05_,'filled','MarkerEdgeColor',0.15*[1,1,1],'LineWidth',0.5);
 axis equal; grid on;
-title('AZnV_D_Up05_cap_Ap05_p01_ (case-vs-ctrl)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title('AZnV_D_Up05_cap_AFULLp05_p01_ (case-vs-ctrl)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%;
 subplot(2,2,1+np);np=np+1;
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Ap05_,'filled','MarkerEdgeColor',0.85*[0,1,0],'LineWidth',0.5);
+scatter(AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_AFULLp05_,'filled','MarkerEdgeColor',0.85*[0,1,0],'LineWidth',0.5);
 axis equal; grid on;
-title('AZnV_D_Ap05_from_Up05_cap_Ap05_p01_ (case-vs-ctrl)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title('AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_ (case-vs-ctrl)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 %%%%;
 subplot(2,2,1+np);np=np+1;
 hold on;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Up05_,'filled','MarkerEdgeColor',0.15*[1,1,1],'LineWidth',0.5);
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Ap05_,'filled','MarkerEdgeColor',0.85*[0,1,0],'LineWidth',0.5);
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_Up05_,'filled','MarkerEdgeColor',0.15*[1,1,1],'LineWidth',0.5);
+scatter(AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_AFULLp05_,'filled','MarkerEdgeColor',0.85*[0,1,0],'LineWidth',0.5);
 hold off;
 axis equal; grid on;
 title('both together (case-vs-ctrl)','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
@@ -574,43 +591,43 @@ end;%if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
 flag_recalc = 0;
 fname_ssv = sprintf('%s/dir_Up05/AZnV_D_Up05_p01_.txt',dir_trunk);
 if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'AZnV_D_Up05_p01_','-ascii'); end;
-fname_ssv = sprintf('%s/dir_Up05/AZnV_D_Up05_cap_Ap05_p01_.txt',dir_trunk);
-if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'AZnV_D_Up05_cap_Ap05_p01_','-ascii'); end;
+fname_ssv = sprintf('%s/dir_Up05/AZnV_D_Up05_cap_AFULLp05_p01_.txt',dir_trunk);
+if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'AZnV_D_Up05_cap_AFULLp05_p01_','-ascii'); end;
 fname_ssv = sprintf('%s/dir_Up05/V_D_Up05_p01_.txt',dir_trunk);
 if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'V_D_Up05_p01_','-ascii'); end;
-fname_ssv = sprintf('%s/dir_Up05/V_D_Up05_cap_Ap05_p01_.txt',dir_trunk);
-if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'V_D_Up05_cap_Ap05_p01_','-ascii'); end;
+fname_ssv = sprintf('%s/dir_Up05/V_D_Up05_cap_AFULLp05_p01_.txt',dir_trunk);
+if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'V_D_Up05_cap_AFULLp05_p01_','-ascii'); end;
 
 %%%%%%%%;
-% use AZnV_D_Ap05_from_Up05_cap_Ap05_p01_ to separate the Ap05 patients into 3 continents; 
-% Get mean of PC1 for each Up05 continent. Then assign Ap05 subjects based
+% use AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_ to separate the AFULLp05 patients into 3 continents; 
+% Get mean of PC1 for each Up05 continent. Then assign AFULLp05 subjects based
 % on closest value of PC1.
 %%%%%%%%;
-PC1_mean_Up05_cap_Ap05_p01 = grpstats(AZnV_D_Up05_cap_Ap05_p01_(:,1), mr_Up05_p01_continent_, 'mean');
+PC1_mean_Up05_cap_AFULLp05_p01 = grpstats(AZnV_D_Up05_cap_AFULLp05_p01_(:,1), mr_Up05_p01_continent_, 'mean');
 
-V = AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1);
-N = PC1_mean_Up05_cap_Ap05_p01;
+V = AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1);
+N = PC1_mean_Up05_cap_AFULLp05_p01;
 A = repmat(N,[1 length(V)]);
 [minValue,closestIndex] = min(abs(A-V'));
-mr_Ap05_from_Up05_cap_Ap05_p01_continent_ = (closestIndex-1)';
+mr_AFULLp05_from_Up05_cap_AFULLp05_p01_continent_ = (closestIndex-1)';
 %%%%;
 if flag_disp;
 figure(1+nf);nf=nf+1;clf;figsml;fig80s;
 markersize_use = 12;
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_dvx_Ap05_ + 2*mr_Ap05_from_Up05_cap_Ap05_p01_continent_,'filled','MarkerEdgeColor','k');
+scatter(AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_dvx_AFULLp05_ + 2*mr_AFULLp05_from_Up05_cap_AFULLp05_p01_continent_,'filled','MarkerEdgeColor','k');
 axis equal; grid on;
-title('Ap05_from_Up05_cap_Ap05_p01_continent_','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
+title('AFULLp05_from_Up05_cap_AFULLp05_p01_continent_','Interpreter','none'); xlabel('PC1'); ylabel('PC2');
 end;%if flag_disp;
 %%%%;
 flag_recalc=0;
-fname_tsv = sprintf('%s/dir_Ap05/mr_Ap05_from_Up05_cap_Ap05_p01_continent_.txt',dir_trunk);
+fname_tsv = sprintf('%s/dir_AFULLp05/mr_AFULLp05_from_Up05_cap_AFULLp05_p01_continent_.txt',dir_trunk);
 if (flag_recalc | ~exist(fname_tsv,'file'));
 fp = fopen(fname_tsv,'w');
-fprintf(fp,'%d\n',mr_Ap05_from_Up05_cap_Ap05_p01_continent_);
+fprintf(fp,'%d\n',mr_AFULLp05_from_Up05_cap_AFULLp05_p01_continent_);
 fclose(fp);
 end;%if (flag_recalc | ~exist(fname_tsv,'file'));
-fname_ssv = sprintf('%s/dir_Ap05/AZnV_D_Ap05_from_Up05_cap_Ap05_p01_.txt',dir_trunk);
-if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'AZnV_D_Ap05_from_Up05_cap_Ap05_p01_','-ascii'); end;
+fname_ssv = sprintf('%s/dir_AFULLp05/AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_.txt',dir_trunk);
+if (flag_recalc | ~exist(fname_ssv,'file')); save(fname_ssv,'AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_','-ascii'); end;
 
 
 %%%%%%%%;
@@ -621,8 +638,8 @@ if (flag_replot | ~exist(sprintf('%s.jpg',fname_fig),'file'));
 markersize_use = 16;
 np=0;
 hold on;
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#0072B2','MarkerEdgeColor','k');
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#E69F00','MarkerEdgeColor','k');
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#0072B2','MarkerEdgeColor','k');
+scatter(AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,'filled','MarkerFaceColor','#E69F00','MarkerEdgeColor','k');
 legend('UKB','ADNI','Location','Best');
 axisnotick; title('UKB vs ADNI'); xlabel('PC1'); ylabel('PC2');
 hold off
@@ -644,8 +661,8 @@ colormap(cmap);
 hold on;
 scatter(nan, nan,markersize_use+8, 's','MarkerEdgeColor','k','DisplayName','UKB');
 scatter(nan, nan,markersize_use, 'o','MarkerEdgeColor','k','DisplayName','ADNI');
-scatter(AZnV_D_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Up05_cap_Ap05_p01_(:,1+1),markersize_use+4,mr_Up05_p01_continent_,'s');
-scatter(AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+0),AZnV_D_Ap05_from_Up05_cap_Ap05_p01_(:,1+1),markersize_use,mr_Ap05_from_Up05_cap_Ap05_p01_continent_,'o','filled','MarkerEdgeColor','k');
+scatter(AZnV_D_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use+4,mr_Up05_p01_continent_,'s');
+scatter(AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+0),AZnV_D_AFULLp05_from_Up05_cap_AFULLp05_p01_(:,1+1),markersize_use,mr_AFULLp05_from_Up05_cap_AFULLp05_p01_continent_,'o','filled','MarkerEdgeColor','k');
 legend('UKB','ADNI','Location','Best','FontSize',14);
 axisnotick; xlabel('PC1','FontSize',14); ylabel('PC2','FontSize',14);
 hold off

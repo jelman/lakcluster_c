@@ -14,6 +14,9 @@ if (flag_verbose); disp(sprintf(' %% Note that, this time, we return the ''param
 if (flag_verbose); disp(sprintf(' %% We will later alter this structure to run a new analysis ;')); end;
 if (flag_verbose); disp(sprintf(' %% on a subset of the patients. ;')); end;
 subjectClusters = readtable('/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1/subjectClusterAssignments_PC0.txt','Delimiter','\t');
+
+ncontinent = 2; %<----- Set continent number here, 1-based. 
+
 parameter = struct('type','parameter');
 parameter.flag_verbose = 0;
 parameter.dir_trunk = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1/dir_Up05';
@@ -23,7 +26,7 @@ parameter.mds_name_plus_extension_s_ = {'/home/jelman/Projects/AD_Biclustering/d
 parameter.str_output_prefix = 'test2mds'; 
 parameter.maf_lo_threshold = 0.01;
 parameter.mss_cutoff = .1;
-parameter.n_shuffle = 128;
+parameter.n_shuffle = 500;
 parameter.slurm_memdecl = 128;
 % parameter.ent_cutoff = 0.0045022835561375; %<-- test_stripped_xxxcluster_fromdisk_uADZSZDA_ver16;
 parameter = xxxcluster_fromdisk_uADZSZDA_ver16_dr_0(parameter);
@@ -45,13 +48,13 @@ if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% Now we can alter these row- and col-masks. ;')); end;
 n_patient = numel(mr_A_ori_);
 mr_A_alt_ = mr_A_ori_; 
-% Exclude cases that do not belong to continent of interest
-exclude_case_idx = find(subjectClusters{:,3} == 1 & subjectClusters{:,2} ~= 1);
+% Exclude cases that do not belong to continent of interest. 1-based 
+exclude_case_idx = find(subjectClusters{:,3} == 1 & subjectClusters{:,2} ~= ncontinent);
 % mr_A_alt_([82, 391, 1715, 2553])=0; %<-- remove a few cases. ;
 mr_A_alt_(exclude_case_idx)=0; %<-- remove a few cases.
 mr_Z_alt_ = mr_Z_ori_; 
-% Exclude controls that do not belong to continent of interest
-exclude_ctrl_idx = find(subjectClusters{:,3} == 0 & subjectClusters{:,2} ~= 1);
+% Exclude controls that do not belong to continent of interest. 1-based
+exclude_ctrl_idx = find(subjectClusters{:,3} == 0 & subjectClusters{:,2} ~= ncontinent);
 % mr_Z_alt_([82, 391, 1715, 2553])=0; %<-- remove a few ctrls. ;
 mr_Z_alt_(exclude_ctrl_idx) = 0; %<-- remove a few ctrls. ;
 n_snp = numel(mc_A_ori_);
@@ -61,7 +64,7 @@ if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% Now we specify a row- and col-mask infix for naming. ;')); end;
 if (flag_verbose); disp(sprintf(' %% Then we save the altered masks as files in the input directory. ;')); end;
 % Set name of continent of interest
-str_mr_0in = 'continent1';
+str_mr_0in = sprintf('continent%d',ncontinent);
 str_mc_0in = '';
 fname_mr_A_alt_full = sprintf('%s/%s_mr_A_%s_full.b16',parameter.dir_0in,parameter.str_prefix,str_mr_0in);
 fname_mr_Z_alt_full = sprintf('%s/%s_mr_Z_%s_full.b16',parameter.dir_0in,parameter.str_prefix,str_mr_0in);

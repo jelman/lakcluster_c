@@ -8,7 +8,7 @@ flag_replot = 0;
 if (flag_verbose); disp(sprintf(' %% ;')); end;
 if (flag_verbose); disp(sprintf(' %% Assume path is set using dir_lakcluster_c/dir_m/setup_0.m. ;')); end;
 
-if (flag_verbose); disp(sprintf(' %% Comparing Up05 with Ap05 data. ;')); end;
+if (flag_verbose); disp(sprintf(' %% Comparing Up05 with AFULLp05 data. ;')); end;
 
 if (flag_verbose); disp(sprintf(' %% Comparing Up99 with Up05 data. ;')); end;
 memory_GB = 128; %<-- maybe this should be increased? ;
@@ -26,14 +26,14 @@ if ~exist(dir_jpg_replication,'dir'); disp(sprintf(' %% mkdir %s',dir_jpg_replic
 
 
 %%%%%%%%;
-% First running test_Up05_vs_Ap05_18c_helper_0.m ;
+% First running test_Up05_vs_AFULLp05_18c_helper_0.m ;
 %%%%%%%%;
 
 %%%%%%%%;
 % Now load one of the data-files containing the projected values and labels. ;
 %%%%%%%%;
-ncontinent = 2;
-dataset = 'Ap05';
+ncontinent = 1;
+dataset = 'AFULLp05';
 str_datafile = sprintf('trnUp05_tst_%s_ncontinent%d',dataset,ncontinent);
 
 fname_mat = sprintf('%s/%s.mat',dir_mat_replication,str_datafile);
@@ -50,14 +50,14 @@ markersize_sml = 4;
 fontsize_use = 12;
 subplot(1,2,1);
 hold on;
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==1);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==1);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[0.0,1.0,1.0]);
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==2);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==2);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[0.5,0.0,0.5]);
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==3);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==3);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[1.0,0.0,1.0]);
 legend({'Up05 ctrl','Up05 case','Up05 bicl'},'Location','NorthWest');
 grid on;
@@ -65,15 +65,15 @@ set(gca,'Fontsize',fontsize_use);
 hold off;
 subplot(1,2,2);
 hold on;
-tmp_index_ = efind(tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1);
-X_xd__ = tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==1);
+X_xd__ = tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
 plot(tmp_X_xd__(:,1+0),tmp_X_xd__(:,1+1),'k^','MarkerSize',markersize_sml,'MarkerFaceColor',[0.0,0.8,0.8]);
-tmp_index_ = efind(tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2);
-X_xd__ = tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==2);
+X_xd__ = tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
 plot(tmp_X_xd__(:,1+0),tmp_X_xd__(:,1+1),'k^','MarkerSize',markersize_sml,'MarkerFaceColor',[0.8,0.0,0.8]);
-legend({'Ap05 ctrl','Ap05 case'},'Location','NorthWest');
+legend({'AFULLp05 ctrl','AFULLp05 case'},'Location','NorthWest');
 grid on;
 set(gca,'Fontsize',fontsize_use);
 hold off;
@@ -89,20 +89,20 @@ close(gcf);
 end;%if flag_replot | ~exist(fname_fig_jpg,'file');
 
 %%%%%%%%;
-% Now we try and find a mapping from loaded Ap05 to loaded Up05. ;
-% For Ap05 we will use the projected values: ;
-% tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_. ;
+% Now we try and find a mapping from loaded AFULLp05 to loaded Up05. ;
+% For AFULLp05 we will use the projected values: ;
+% tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_. ;
 % For Up05 we will use the projected values: ;
-% tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_. ;
+% tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_. ;
 % Note that affine_point_match_1 is designed to account for the labels in the data. ;
 % For this point-cloud matching we will use only case vs ctrl labels (i.e., no bicluster labels). ;
 %%%%%%%%;
-tmp_index_Up05_ = efind( (tmp_.mr_dvx_trnUp05_tstAp05_nix_==1) | (tmp_.mr_dvx_trnUp05_tstAp05_nix_==2) | (tmp_.mr_dvx_trnUp05_tstAp05_nix_==3) );
-tmp_.Y_dy__ = transpose(tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_Up05_,:));
-tmp_.label_Y_y_ = min(2,tmp_.mr_dvx_trnUp05_tstAp05_nix_(1+tmp_index_Up05_));
-tmp_index_Ap05_ = efind( (tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1) | (tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2) );
-tmp_.X_dx__ = transpose(tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_Ap05_,:));
-tmp_.label_X_x_ = tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_(1+tmp_index_Ap05_);
+tmp_index_Up05_ = efind( (tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==1) | (tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==2) | (tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==3) );
+tmp_.Y_dy__ = transpose(tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_Up05_,:));
+tmp_.label_Y_y_ = min(2,tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_(1+tmp_index_Up05_));
+tmp_index_AFULLp05_ = efind( (tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==1) | (tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==2) );
+tmp_.X_dx__ = transpose(tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_AFULLp05_,:));
+tmp_.label_X_x_ = tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_(1+tmp_index_AFULLp05_);
 parameter_apm = struct('type','parameter_apm');
 parameter_apm.k_use = 32; %<-- This is the initial number of nearest neighbors to use. ;
 parameter_apm.k_gamma = 0.15; %<-- Continent1 converges at .50, continent2 must be lowered to 0.15 ;
@@ -119,24 +119,24 @@ markersize_sml = 8;
 fontsize_use = 12;
 subplot(1,1,1);
 hold on;
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==1);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==1);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[0.0,1.0,1.0]);
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==2);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==2);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[0.5,0.0,0.5]);
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==3);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==3);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 plot(Y_yd__(:,1+0),Y_yd__(:,1+1),'ko','MarkerSize',markersize_big,'MarkerFaceColor',[1.0,0.0,1.0]);
-tmp_index_ = efind(tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1);
-X_xd__ = tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==1);
+X_xd__ = tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
 plot(tmp_X_xd__(:,1+0),tmp_X_xd__(:,1+1),'k^','MarkerSize',markersize_sml,'MarkerFaceColor',[0.0,0.8,0.8]);
-tmp_index_ = efind(tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2);
-X_xd__ = tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==2);
+X_xd__ = tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
 plot(tmp_X_xd__(:,1+0),tmp_X_xd__(:,1+1),'k^','MarkerSize',markersize_sml,'MarkerFaceColor',[0.8,0.0,0.8]);
-legend({'Up05 ctrl','Up05 case','Up05 bicl','Ap05 ctrl','Ap05 case'},'Location','NorthWest');
+legend({'Up05 ctrl','Up05 case','Up05 bicl','AFULLp05 ctrl','AFULLp05 case'},'Location','NorthWest');
 set(gca,'Fontsize',fontsize_use);
 hold off;
 sgtitle(sprintf('%s',str_datafile),'Interpreter','none');
@@ -153,7 +153,7 @@ end;%if flag_replot | ~exist(fname_fig_jpg,'file');
 %%%%%%%%;
 % Now we can use: ;
 % 1. the labels (ctrls,case,bicl) from the training data (Up05) ;
-% 2. the points (tmp_X_xd__) from the testing data (Ap05) ;
+% 2. the points (tmp_X_xd__) from the testing data (AFULLp05) ;
 % to calculate approximate labels for the testing data. ;
 % These approximate labels will be expressed in the form: ;
 % vlXY_uxy___: a double-array of size numel(unique(Y_m_))-by-size(X_dx__,2)-by-size(Y_dy__,2) ;
@@ -172,30 +172,30 @@ end;%if flag_replot | ~exist(fname_fig_jpg,'file');
 %%%%%%%%;
 Up05_stack_yd__ = zeros(0,2);
 Up05_stack_m_ = zeros(0,1);
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==1);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==1);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 Up05_stack_yd__ = [Up05_stack_yd__;Y_yd__];
 Up05_stack_m_ = [Up05_stack_m_;1*ones(size(Y_yd__,1),1)]; %<-- ctrl label. ;
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==2);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==2);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 Up05_stack_yd__ = [Up05_stack_yd__;Y_yd__];
 Up05_stack_m_ = [Up05_stack_m_;2*ones(size(Y_yd__,1),1)]; %<-- case label. ;
-tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAp05_nix_==3);
-Y_yd__ = tmp_.AZnV_D_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+tmp_index_ = efind(tmp_.mr_dvx_trnUp05_tstAFULLp05_nix_==3);
+Y_yd__ = tmp_.AZnV_D_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 Up05_stack_yd__ = [Up05_stack_yd__;Y_yd__];
 Up05_stack_m_ = [Up05_stack_m_;3*ones(size(Y_yd__,1),1)]; %<-- bicl label. ;
-Ap05_stack_xd__ = zeros(0,2);
-Ap05_stack_m_ = zeros(0,1);
-tmp_index_ = efind(tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==1);
-X_xd__ = tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+AFULLp05_stack_xd__ = zeros(0,2);
+AFULLp05_stack_m_ = zeros(0,1);
+tmp_index_ = efind(tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==1);
+X_xd__ = tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
-Ap05_stack_xd__ = [Ap05_stack_xd__;tmp_X_xd__];
-Ap05_stack_m_ = [Ap05_stack_m_;1*ones(size(tmp_X_xd__,1),1)]; %<-- ctrl label. ;
-tmp_index_ = efind(tmp_.mr_dvx_Ap05_from_trnUp05_tstAp05_nix_==2);
-X_xd__ = tmp_.AZnV_D_Ap05_from_trnUp05_tstAp05_nix_p01_(1+tmp_index_,:);
+AFULLp05_stack_xd__ = [AFULLp05_stack_xd__;tmp_X_xd__];
+AFULLp05_stack_m_ = [AFULLp05_stack_m_;1*ones(size(tmp_X_xd__,1),1)]; %<-- ctrl label. ;
+tmp_index_ = efind(tmp_.mr_dvx_AFULLp05_from_trnUp05_tstAFULLp05_nix_==2);
+X_xd__ = tmp_.AZnV_D_AFULLp05_from_trnUp05_tstAFULLp05_nix_p01_(1+tmp_index_,:);
 tmp_X_xd__ = transpose(a_est_ + A_est__*transpose(X_xd__));
-Ap05_stack_xd__ = [Ap05_stack_xd__;tmp_X_xd__];
-Ap05_stack_m_ = [Ap05_stack_m_;2*ones(size(tmp_X_xd__,1),1)]; %<-- case label. ;
+AFULLp05_stack_xd__ = [AFULLp05_stack_xd__;tmp_X_xd__];
+AFULLp05_stack_m_ = [AFULLp05_stack_m_;2*ones(size(tmp_X_xd__,1),1)]; %<-- case label. ;
 %%%%%%%%;
 [ ...
  parameter_apm ...
@@ -205,7 +205,7 @@ Ap05_stack_m_ = [Ap05_stack_m_;2*ones(size(tmp_X_xd__,1),1)]; %<-- case label. ;
 ] = ...
 affine_point_match_vector_label_0( ...
  parameter_apm ...
-,transpose(Ap05_stack_xd__) ...
+,transpose(AFULLp05_stack_xd__) ...
 ,transpose(Up05_stack_yd__) ...
 ,Up05_stack_m_ ...
 );
@@ -213,10 +213,10 @@ affine_point_match_vector_label_0( ...
 % Now we can convert the vector-labels vlXY_uxy___ into conditional-labels. ;
 % vbXY_xk__ is an array of size n_x by n_y, where: ;
 % vbXY_xk__(1+nx,1+ny) holds the relative (i.e., conditional) bicluster-label for point nx, ;
-% corresponding to the point at Ap05_stack_xd__(1+nx,:). ;
+% corresponding to the point at AFULLp05_stack_xd__(1+nx,:). ;
 % as estimated using k=1+ny nearest-neighbors from Up05_stack_yd__. ;
 %%%%%%%%;
-n_x = size(Ap05_stack_xd__,1);
+n_x = size(AFULLp05_stack_xd__,1);
 n_y = size(Up05_stack_yd__,1);
 vbXY_xk__ = zeros(n_x,n_y);
 nu_bicl = 3-1; %<-- bicluster case-label index within u_Y_m_u_. ;
@@ -245,21 +245,21 @@ tmp_index_ = efind(Up05_stack_m_==1+1); %<-- case label. ;
 plot(Up05_stack_yd__(1+tmp_index_,1+0),Up05_stack_yd__(1+tmp_index_,1+1),s0_case,'LineStyle','none','MarkerEdgeColor',e0_case_,'MarkerFaceColor',c0_case_,'MarkerSize',markersize_sml);
 tmp_index_ = efind(Up05_stack_m_==2+1); %<-- bicl label. ;
 plot(Up05_stack_yd__(1+tmp_index_,1+0),Up05_stack_yd__(1+tmp_index_,1+1),s0_bicl,'LineStyle','none','MarkerEdgeColor',e0_bicl_,'MarkerFaceColor',c0_bicl_,'MarkerSize',markersize_sml);
-tmp_index_ = efind(Ap05_stack_m_==0+1); %<-- ctrl label. ;
-plot(Ap05_stack_xd__(1+tmp_index_,1+0),Ap05_stack_xd__(1+tmp_index_,1+1),s1_ctrl,'LineStyle','none','MarkerEdgeColor',e1_ctrl_,'MarkerFaceColor',c1_ctrl_,'MarkerSize',markersize_med);
-tmp_index_ = efind(Ap05_stack_m_==1+1); %<-- case label. ;
+tmp_index_ = efind(AFULLp05_stack_m_==0+1); %<-- ctrl label. ;
+plot(AFULLp05_stack_xd__(1+tmp_index_,1+0),AFULLp05_stack_xd__(1+tmp_index_,1+1),s1_ctrl,'LineStyle','none','MarkerEdgeColor',e1_ctrl_,'MarkerFaceColor',c1_ctrl_,'MarkerSize',markersize_med);
+tmp_index_ = efind(AFULLp05_stack_m_==1+1); %<-- case label. ;
 n_l = numel(tmp_index_);
 for nl=0:n_l-1;
 tmp_index = tmp_index_(1+nl);
 nc_use = max(0,min(n_c_use-1,floor(n_c_use*vbXY_xk__(1+tmp_index,1+nk)/1.0)));
 c_use_ = c_use__(1+nc_use,:);
-plot(Ap05_stack_xd__(1+tmp_index,1+0),Ap05_stack_xd__(1+tmp_index,1+1),s1_case,'LineStyle','none','MarkerEdgeColor',c_use_.^2,'MarkerFaceColor',c_use_,'MarkerSize',markersize_med);
+plot(AFULLp05_stack_xd__(1+tmp_index,1+0),AFULLp05_stack_xd__(1+tmp_index,1+1),s1_case,'LineStyle','none','MarkerEdgeColor',c_use_.^2,'MarkerFaceColor',c_use_,'MarkerSize',markersize_med);
 end;%for nl=0:n_l-1;
 hold off;
 set(gca,'FontSize',fontsize_use);
 axisnotick();
 title(sprintf('f %0.2f',tmp_f));
-legend({'Up05 ctrl','Up05 case','Up05 bicl','Ap05 ctrl','Ap05 case'},'Location','NorthWest');
+legend({'Up05 ctrl','Up05 case','Up05 bicl','AFULLp05 ctrl','AFULLp05 case'},'Location','NorthWest');
 end;%for tmp_f = [0.05,0.10,0.15,0.20,.30,.40];
 %%%%;
 fname_fig_pre = sprintf('%s/%s_vector_label_FIGD',dir_jpg_replication,str_datafile);
@@ -275,7 +275,7 @@ end;%if flag_replot | ~exist(fname_fig_jpg,'file');
 
 %%%%%%%%;
 % Get number of nearest neighbors from the optimal nearest-neighbor-fraction 
-% f identified from the ADNI replication run in test_Up05_vs_Ap05_18c_helper_0.m. ;
+% f identified from the ADNI replication run in test_Up05_vs_AFULLp05_18c_helper_0.m. ;
 % These can be used to calculate: ;
 % conditional labels = biclust_cases / (biclust_cases + cases)
 % unconditional labels = biclust_cases / (biclust_cases + cases + controls);
@@ -297,7 +297,7 @@ tmp_y_ = linspace(0,1,n_y);
 % neighbors. Columns: 1 = controls, 2 = cases, 3 = bicluster cases ;
 biclust_labels = vcXY_uxy___(:,:,max_f_idx).';
 % Load fam file 
-fname_famext = '/home/jelman/Projects/AD_Biclustering/data/ADNI/ADNI_vs_UKB/dir_Ap05/dir_test2mds_maf01/test2mds_maf01_fam.ext';
+fname_famext = '/home/jelman/Projects/AD_Biclustering/data/ADNI/ADNI_vs_UKB/dir_AFULLp05/dir_test2mds_maf01/test2mds_maf01_fam.ext';
 [ ...
 ,n_patient ...
 ,fam_fid_ ...
@@ -314,9 +314,9 @@ load_famext_ver1( ...
  fname_famext ...
 );
 % Get subject ids belonging to continent ;
-fam_iid_cont = fam_iid_(tmp_index_Ap05_ +1);
+fam_iid_cont = fam_iid_(tmp_index_AFULLp05_ +1);
 % Open the file for writing
-tmp_fname_biclust_labels = sprintf('%s/dir_%s/Ap05_from_Up05_cap_biclust_labels_continent%d_.txt',dir_trunk,dataset,ncontinent);
+tmp_fname_biclust_labels = sprintf('%s/dir_%s/AFULLp05_from_Up05_cap_biclust_labels_continent%d_.txt',dir_trunk,dataset,ncontinent);
 fid = fopen(tmp_fname_biclust_labels, 'w');
 % Write the data to the file
 for i = 1:length(fam_iid_cont)

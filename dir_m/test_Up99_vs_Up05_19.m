@@ -426,6 +426,7 @@ AZnV_DandX_Up99_p01_pnt___(:,:,1+np_threshold) = tmp_AZnV_DandX_Up99_p01_;
 %%%%%%%%;
 end;%for np_threshold=0:n_p_threshold-1;
 %%%%%%%%;
+end;%if flag_calc;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -473,6 +474,7 @@ writematrix(labels_out_all - 1, sprintf('%s/dir_Up99/mr_Up99_p01_continent_.txt'
 writematrix(labels_out_all - 1, sprintf('%s/dir_Up05/mr_Up05_p01_continent_.txt',dir_trunk));
 % nf=0;
 
+
 % platform = 'rusty';
 % if (exist('platform.type','file')); fp=fopen('platform.type'); platform = fscanf(fp,'%s'); fclose(fp); end;
 % if (strcmp(platform,'access1')); str_home = 'data'; end;
@@ -500,6 +502,7 @@ p_row = 4; p_col = ceil(n_p_threshold/p_row); np=0;
 for np_threshold=0:n_p_threshold-1;
 p_threshold = p_threshold_(1+np_threshold);
 str_p_threshold = sprintf('%.2d',min(99,floor(100*p_threshold)));
+n_snps = nnz(Up99_bim_ADp_<=p_threshold)/3;
 subplot(p_row,p_col,1+np);np=np+1;
 tmp_fname_AnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_AnV_.mda',dir_pca_tmp,str_p_threshold);
 tmp_fname_ZnV_txx = sprintf('%s/pca_proj_D_Up99t%s_DandX_p01_k2_B44_ZnV_.mda',dir_pca_tmp,str_p_threshold);
@@ -510,7 +513,7 @@ tmp_AZnV_txx__ = tmp_AnV_txx__ + tmp_ZnV_txx__;
 colormap(cmap);
 scatter(tmp_AZnV_txx__(:,1+0),tmp_AZnV_txx__(:,1+1),markersize_use,mr_Up99_p01_continent_,'filled','MarkerEdgeColor','#D3D3D3','Linewidth',0.5,'MarkerEdgeAlpha',.5);
 end;%if exist(tmp_fname_AnV_txx,'file') & exist(tmp_fname_AnV_txx,'file');
-xlabel('PC1');ylabel('PC2');title(sprintf('p<%0.2f',p_threshold));
+xlabel('PC1');ylabel('PC2');title(sprintf('p<%0.2f, n SNPs=%d',p_threshold, n_snps));
 end;%for np_threshold=0:n_p_threshold-1;
 %%%%%%%%;
 print('-djpeg',fname_fig_jpg);
@@ -633,7 +636,73 @@ parameter_scatterheat ...
 , AZnV_0_lim_,AZnV_0_tick_,AZnV_1_lim_,AZnV_1_tick_);
 
 
-end;%if flag_calc;
 
 
+%%%%%%%%%%%%%%%%%%
+% Plot PCA loadings of p<0.05 SNPs 
+%%%%%%%%%%%%%%%%%%
+% First get PCA from p<0.05 threshold;
+p_threshold = 0.05
+str_p_threshold = sprintf('%.2d',min(99,floor(100*p_threshold)));
+pca_mr_A_Up99_ = { 1*mr_A_ori_Up99_ + 1*mr_Z_ori_Up99_ };
+pca_mr_Z_Up99_ = { 0*mr_A_ori_Up99_ + 0*mr_Z_ori_Up99_ };
+pca_mc_A_Up99 = mc_A_ori_Up99_;
+tmp_mc_ = zeros(dataset_{1+ndataset_Up99}.n_snp,1);
+tmp_mc_(1+efind(Up99_bim_ADp_<=p_threshold))=1;
+pca_mc_A_Up99 = tmp_mc_;
+pca_str_infix_Up99=sprintf('Up99t%s_DandX_p01',str_p_threshold);
+parameter_DandX_Up99_p01 = parameter_Up99;
+parameter_DandX_Up99_p01.flag_force_create = 0;
+parameter_DandX_Up99_p01.str_A_p = str_Up99_A_p_p01;
+parameter_DandX_Up99_p01.str_name_s0000 = sprintf('pca_Up99t%s_DandX_p01',str_p_threshold);
+parameter_DandX_Up99_p01.slurm_memdecl = memory_GB;
+tmp_t = tic(); if (flag_verbose); disp(sprintf(' %% xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16 ...')); end;
+[ ...
+ parameter_DandX_Up99_p01 ...
+,tmp_AZnV_DandX_Up99_p01_ ...
+,tmp_AnV_DandX_Up99_p01_ ...
+,tmp_ZnV_DandX_Up99_p01_ ...
+,tmp_V_DandX_Up99_p01_ ...
+] = ...
+xxxcluster_fromdisk_uADZSZDA_pca_D_from_mx_ver16( ...
+ parameter_DandX_Up99_p01 ...
+,pca_rank ...
+,pca_mr_A_Up99_ ...
+,pca_mr_Z_Up99_ ...
+,pca_mc_A_Up99 ...
+,pca_str_infix_Up99 ...
+);
 
+% Concatenate with chromosome, position, and maf
+col_loadings_p05 = [tmp_V_DandX_Up99_p01_ double(dataset_{1}.bim_khr_) double(dataset_{1}.bim_pdi_) dataset_{1}.bim_maf_];
+% Sort by chr and pos
+col_loadings_p05 = sortrows(col_loadings_p05, [3 4]);
+% Filter for only p<0.05 rows. These have non-zero values in first 2 cols;
+nonZeroRows = ~(col_loadings_p05(:,1) == 0 & col_loadings_p05(:,2) == 0);
+col_loadings_p05 = col_loadings_p05(nonZeroRows, :);
+% Add headers: PC1, PC2, chr, pos, maf. The save to file
+fname_loadings_p05 = '/home/jelman/Projects/AD_Biclustering/data/UKB/ukb_pca_p05-p1/ukb_pca_p05_snp-loadings.txt';
+header = {'PC1', 'PC2', 'chr', 'pos', 'maf'};
+col_loadings_p05 = [header; num2cell(col_loadings_p05)];
+writecell(col_loadings_p05, fname_loadings_p05, 'Delimiter', '\t');
+
+% Add row indices as columm
+rowNums = double(1:size(col_loadings_p05))';
+col_loadings_p05 = [col_loadings_p05 rowNums];
+% Plot PC1
+binscatter(col_loadings_p05(:,6), col_loadings_p05(:,1))
+xlabel('Column #');
+ylabel('PC1 loading');
+
+% Plot PC2
+binscatter(col_loadings_p05(:,6), col_loadings_p05(:,2))
+xlabel('Column #');
+ylabel('PC2 loading');
+
+max_loadings = [col_loadings_p05 abs(col_loadings_p05(:,1))];
+max_loadings = sortrows(max_loadings, -7);
+% Top loadings all fall in a region of chr17. Subset these rows;
+chr17_loadings = max_loadings(1:7715,:);
+% Get boundaries of LD region;
+minpos = min(chr17_loadings(:,4));
+maxpos = max(chr17_loadings(:,4));
